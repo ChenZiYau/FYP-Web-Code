@@ -13,7 +13,6 @@
         <div class="logo-container">
             <a href="#welcome" class="logo-link">
                 <img src="../img/optiplanlogo.png" alt="OptiPlan Logo" class="logo-img">
-
             </a>
         </div>
         

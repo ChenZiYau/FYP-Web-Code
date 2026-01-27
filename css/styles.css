@@ -111,8 +111,8 @@ body::before {
 }
 
 .logo-img {
-    height: 75px;
-    width: auto;
+    height: 100px;
+    width: 100px;
     display: block;
     object-fit: contain;
     filter: drop-shadow(0 0 10px rgba(181, 54, 204, 0.4));

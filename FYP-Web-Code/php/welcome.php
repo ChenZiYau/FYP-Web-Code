@@ -34,7 +34,7 @@
 </header>
 
 <section id="welcome" class="hero">
-    <div class="container">
+    <div class="hero-container">
         <div class="hero-flex">
             <div class="hero-content">
                 <h1 class="hero-title">The Evolution of Productivity</h1>

@@ -254,11 +254,6 @@ body::before {
     z-index: 2;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
 .hero-title {
     font-size: 56px;
     font-weight: 800;
@@ -373,10 +368,11 @@ body::before {
 }
 
 /* ==========================================================================
-   6. TUTORIALS, FAQ, & FEEDBACK
+   6. TUTORIALS SECTION
    ========================================================================== */
-.tutorials, .faq, .feedback {
+.tutorials {
     padding: 100px 0;
+    background: rgba(10, 10, 11, 0.5);
 }
 
 .section-title {
@@ -388,10 +384,6 @@ body::before {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-}
-
-.tutorials {
-    background: rgba(10, 10, 11, 0.5);
 }
 
 .tutorial-card-main {
@@ -460,29 +452,6 @@ body::before {
     color: #808080;
 }
 
-.video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 32px;
-}
-
-.video-card {
-    position: relative;
-    aspect-ratio: 16/9;
-    background: linear-gradient(135deg, rgba(181, 54, 204, 0.1) 0%, rgba(45, 11, 61, 0.2) 100%);
-    border: 1px solid rgba(181, 54, 204, 0.2);
-    border-radius: 16px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.video-card:hover {
-    transform: translateY(-5px);
-    border-color: #B536CC;
-    box-shadow: 0 12px 32px rgba(181, 54, 204, 0.3);
-}
-
 .video-overlay {
     position: absolute;
     inset: 0;
@@ -492,10 +461,6 @@ body::before {
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(5px);
     transition: all 0.3s ease;
-}
-
-.video-card:hover .video-overlay {
-    background: rgba(0, 0, 0, 0.6);
 }
 
 .play-icon {
@@ -511,34 +476,13 @@ body::before {
     transition: all 0.3s ease;
 }
 
-.video-card:hover .play-icon {
-    transform: scale(1.1);
-}
-
-.video-info {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 20px;
-    background: linear-gradient(to top, rgba(10, 10, 11, 0.95), transparent);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.video-emoji {
-    font-size: 24px;
-}
-
-.video-info h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #E8E8E8;
-}
 /* ==========================================================================
-   7. FAQ SECTION (FIXED SMOOTH ANIMATION)
+   7. FAQ SECTION
    ========================================================================== */
+.faq {
+    padding: 100px 0;
+}
+
 .faq-list {
     max-width: 900px; /* Slightly wider as seen in image */
     margin: 0 auto;
@@ -590,10 +534,6 @@ body::before {
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.faq-arrow.rotate {
-    transform: rotate(180deg);
-}
-
 /* Smooth Opening Logic */
 .faq-answer {
     max-height: 0;
@@ -625,7 +565,11 @@ body::before {
     font-size: 17px;
 }
 
+/* ==========================================================================
+   8. FEEDBACK SECTION
+   ========================================================================== */
 .feedback {
+    padding: 100px 0;
     background: rgba(10, 10, 11, 0.5);
 }
 
@@ -682,7 +626,7 @@ body::before {
 }
 
 /* ==========================================================================
-   8. FOOTER
+   9. FOOTER
    ========================================================================== */
 .footer {
     background: rgba(10, 10, 11, 0.95);
@@ -731,7 +675,7 @@ body::before {
 }
 
 /* ==========================================================================
-   8. RESPONSIVE MEDIA QUERIES
+   10. RESPONSIVE MEDIA QUERIES
    ========================================================================== */
 @media (max-width: 768px) {
     .logo-img {
@@ -782,10 +726,6 @@ body::before {
 
     .ai-highlight-box {
         padding: 20px;
-    }
-
-    .video-grid {
-        grid-template-columns: 1fr;
     }
 
     .tutorial-content-wrapper {

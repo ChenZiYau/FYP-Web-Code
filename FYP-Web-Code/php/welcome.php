@@ -13,7 +13,7 @@
     <div class="container header-content">
         <div class="logo-container">
             <a href="#welcome" class="logo-link">
-                <img src="../img/optiplanlogo.png" alt="OptiPlan Logo" class="logo-img">
+                <img src="../img/optiplanlogoheader.png" alt="OptiPlan Logo" class="logo-img">
             </a>
         </div>
         
@@ -25,7 +25,7 @@
         </nav>
         
         <div class="header-auth">
-            <a href="#login" class="btn-login-nav">Log In</a>
+            <a href="../php/login.php" class="btn-login-nav">Log In</a>
             <a href="#signup" class="btn-try-nav">Try Now</a>
         </div>
     </div>
@@ -42,7 +42,7 @@
                     and daily tasks in a single, streamlined platform.
                 </p>
                 <div class="hero-buttons">
-                    <a href="#login" class="btn btn-primary">Log In</a>
+                    <a href="http://localhost/FYP/FYP-Web-Code/php/login.php" class="btn btn-primary">Log In</a>
                     <a href="#signup" class="btn btn-secondary">Get Started</a>
                 </div>
             </div>

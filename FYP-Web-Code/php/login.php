@@ -35,15 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OptiPlan - Sign In</title>
     <link rel="stylesheet" href="../css/login-styles.css">
+    <link rel="stylesheet" href="../css/header.css">
 </head>
 <body>
     <!-- Fixed Header -->
     <header class="header">
-        <a href="index.php" class="logo-link">
-            <img src="../img/optiplanlogo.png" alt="OptiPlan Logo" class="logo">
-        </a>
-    </header>
-
+    <div class="container-header-content">
+        <div class="logo-container">
+            <a href="../php/welcome.php" class="logo-link">
+                <img src="../img/optiplanlogoheader.png" alt="OptiPlan Logo" class="logo-img">
+            </a>
+        </div>
+    </div>
+</header>
     <!-- Background Animation -->
     <div class="bg-gradient"></div>
 

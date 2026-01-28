@@ -38,33 +38,6 @@ body {
     }
 }
 
-/* Header */
-.header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 1.5rem 2rem;
-    background: transparent;
-    z-index: 1000;
-}
-
-.logo-link {
-    display: inline-block;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.logo-link:hover {
-    opacity: 0.8;
-    transform: translateY(-2px);
-}
-
-.logo {
-    height: 40px;
-    width: auto;
-    display: block;
-}
-
 /* Main Container */
 .container {
     position: relative;
@@ -368,10 +341,6 @@ input[type="password"]:focus {
     
     .auth-card {
         padding: 2rem 1.5rem;
-    }
-    
-    .header {
-        padding: 1rem 1.5rem;
     }
     
     .logo {

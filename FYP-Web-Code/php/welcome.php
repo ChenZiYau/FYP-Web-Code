@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OptiPlan - The Evolution of Productivity</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/header.css">
 </head>
 <body>
     <!-- Sticky Header -->
      <!-- Change -->
     <header class="header">
-    <div class="container header-content">
+    <div class="container-header-content">
         <div class="logo-container">
             <a href="#welcome" class="logo-link">
                 <img src="../img/optiplanlogoheader.png" alt="OptiPlan Logo" class="logo-img">
@@ -26,7 +27,7 @@
         
         <div class="header-auth">
             <a href="../php/login.php" class="btn-login-nav">Log In</a>
-            <a href="#signup" class="btn-try-nav">Try Now</a>
+            <a href="../php/signup.php" class="btn-try-nav">Try Now</a>
         </div>
     </div>
 </header>

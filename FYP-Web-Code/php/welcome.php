@@ -6,6 +6,7 @@
     <title>OptiPlan - The Evolution of Productivity</title>
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/corestyles.css">
 </head>
 <body>
     <!-- Sticky Header -->

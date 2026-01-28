@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>OptiPlan - Sign In</title>
     <link rel="stylesheet" href="../css/login-styles.css">
     <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/corestyles.css">
 </head>
 <body>
     <!-- Fixed Header -->

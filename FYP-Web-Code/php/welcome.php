@@ -33,8 +33,8 @@
     </div>
 </header>
 
-<section id="welcome" class="hero">
-    <div class="hero-container">
+<section id="welcome" class="hero-section">
+    <div class="hero-container-wrapper">
         <div class="hero-flex">
             <div class="hero-content">
                 <h1 class="hero-title">The Evolution of Productivity</h1>
@@ -54,8 +54,8 @@
 </section>
 
     <!-- About Section -->
-    <section id="about" class="about">
-    <div class="container">
+    <section id="about" class="about-section">
+    <div class="about-container-wrapper">
         <h2 class="section-title">About OptiPlan</h2>
         
         <div class="about-card-main">
@@ -111,49 +111,52 @@
 </section>
 
     <!-- Tutorial Videos Section -->
-<section id="tutorials" class="tutorials">
-    <div class="container">
+<section id="tutorials" class="tutorials-section">
+    <div class="tutorials-container-wrapper">
         <h2 class="section-title">Product Guide</h2>
         
         <div class="tutorial-card-main">
-            <div class="tutorial-content-wrapper">
-                <div class="tutorial-list">
-                    <?php
-                    $videos = [
-                        ['title' => 'AI Schedule Optimizer', 'icon' => '📅'],
-                        ['title' => 'Flashcard Studio', 'icon' => '🎴'],
-                        ['title' => 'Finance Dashboard', 'icon' => '📊'],
-                        ['title' => 'Collaborative Workspace', 'icon' => '👥'],
-                        ['title' => 'Smart Task Manager', 'icon' => '✓'],
-                        ['title' => 'AI Note Summarizer', 'icon' => '📝']
-                    ];
-                    
-                    foreach ($videos as $video): ?>
-                        <div class="tutorial-item">
-                            <span class="tutorial-emoji"><?php echo $video['icon']; ?></span>
-                            <h3><?php echo $video['title']; ?></h3>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                
-                <div class="tutorial-video-display">
-                    <div class="video-player">
-                        <div class="video-overlay">
-                            <div class="play-icon">▶</div>
-                        </div>
-                        <div class="video-placeholder-text">
-                            <p>Select a feature to watch tutorial</p>
-                        </div>
+    <div class="tutorial-showcase-layout">
+        <div class="tutorial-sidebar">
+            <?php
+            $videos = [
+                ['title' => 'AI Schedule Optimizer', 'icon' => '📅', 'id' => 'sched'],
+                ['title' => 'Flashcard Studio', 'icon' => '🎴', 'id' => 'flash'],
+                ['title' => 'Finance Dashboard', 'icon' => '📊', 'id' => 'fin'],
+                ['title' => 'Collaborative Workspace', 'icon' => '👥', 'id' => 'collab'],
+                ['title' => 'Smart Task Manager', 'icon' => '✓', 'id' => 'task'],
+                ['title' => 'AI Note Summarizer', 'icon' => '📝', 'id' => 'note']
+            ];
+            
+            foreach ($videos as $index => $video): ?>
+                <div class="tutorial-nav-item <?php echo $index === 0 ? 'active' : ''; ?>" 
+                     data-video-id="<?php echo $video['id']; ?>">
+                    <span class="tutorial-emoji"><?php echo $video['icon']; ?></span>
+                    <div class="tutorial-text-content">
+                        <h3><?php echo $video['title']; ?></h3>
                     </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="tutorial-video-display">
+            <div class="video-player">
+                <div class="video-overlay">
+                    <div class="play-icon">▶</div>
+                </div>
+                <div class="video-placeholder-text">
+                    <p>Select a feature to watch tutorial</p>
                 </div>
             </div>
         </div>
     </div>
+</div>
+    </div>
 </section>
 
     <!-- FAQ Section -->
-    <section id="faq" class="faq">
-        <div class="container">
+    <section id="faq" class="faq-section">
+        <div class="faq-container-wrapper">
             <h2 class="section-title">Frequently Asked Questions</h2>
             <div class="faq-list">
                 <div class="faq-item">
@@ -206,8 +209,8 @@
     </section>
 
     <!-- Feedback Section -->
-    <section id="feedback" class="feedback">
-        <div class="container">
+    <section id="feedback" class="feedback-section">
+        <div class="feedback-container-wrapper">
             <h2 class="section-title">Send Us Your Feedback</h2>
             <form class="feedback-form" method="POST" action="submit_feedback.php">
                 <div class="form-row">
@@ -306,7 +309,30 @@
 
     // Toggle the clicked one
     itemToToggle.classList.toggle('active');
-}
+    }
+
+    const observerOptions = {
+    threshold: Array.from({ length: 101 }, (_, i) => i / 100) // Creates 100 thresholds for smooth fading
+    };
+
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            // Calculate opacity based on how much of the section is visible
+            const ratio = entry.intersectionRatio;
+            // Apply opacity to the internal content wrapper to keep the background stable
+            const content = entry.target.querySelector('[class$="-wrapper"], .about-card-main');
+            if (content) {
+                content.style.opacity = ratio;
+                content.style.transform = `translateY(${(1 - ratio) * -20}px)`; // Slight upward drift
+                content.style.transition = 'none'; // Ensure immediate response to scroll
+            }
+        });
+    }, observerOptions);
+
+    // Observe all major sections
+    document.querySelectorAll('section').forEach(section => {
+        scrollObserver.observe(section);
+    });
     </script>
 </body>
 </html>

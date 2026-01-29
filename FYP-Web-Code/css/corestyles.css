@@ -48,3 +48,13 @@ body::before {
         transform: scale(1.15) translate(2%, 1%);
     }
 }
+
+/* Smooth transition for the JS-controlled opacity */
+.container, .hero-container, .about-card-main {
+    will-change: opacity, transform;
+}
+
+/* Section transitions */
+section {
+    transition: background-color 0.8s ease;
+}

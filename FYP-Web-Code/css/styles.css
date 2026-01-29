@@ -1,14 +1,11 @@
 /* ==========================================================================
    1. GLOBAL STYLES & RESET
    ========================================================================== */
-.hero, .about, .tutorials, .faq, .feedback {
-    background: transparent !important;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
+:root {
+    --brand-purple: #B536CC;
+    --dark-bg: #0A0A0B;
+    --glass-bg: rgba(181, 54, 204, 0.05);
+    --text-main: #E8E8E8;
 }
 
 .hero-container {
@@ -96,9 +93,15 @@
 /* ==========================================================================
    4. HERO SECTION
    ========================================================================== */
-.hero {
-    text-align: left;
-    padding: 200px 0 310px;
+.hero-section {
+    padding: 300px 0 300px;
+    background: transparent; /* Keep hero transparent to see the 'breathing' blobs */
+}
+
+.hero-container-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 100px;
 }
 
 .hero-flex {
@@ -137,9 +140,15 @@
 /* ==========================================================================
    5. ABOUT SECTION & CARDS
    ========================================================================== */
-.about {
-    background: #0A0A0B;
+.about-section {
     padding: 100px 0;
+    background: var(--dark-bg);
+}
+
+.about-container-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
 }
 
 .about-card-main {
@@ -228,9 +237,61 @@
 /* ==========================================================================
    6. TUTORIALS SECTION
    ========================================================================== */
-.tutorials {
+.tutorials-section {
     padding: 100px 0;
-    background: rgba(10, 10, 11, 0.5);
+    background: rgba(10, 10, 11, 0.5); /* Semi-transparent depth */
+}
+.tutorials-container-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* --- New Tutorial Layout Logic --- */
+.tutorial-showcase-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Sidebar takes 1 part of the space */
+.tutorial-sidebar {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* New Navigation Item styling */
+.tutorial-nav-item {
+    background: rgba(181, 54, 204, 0.05);
+    border: 1px solid rgba(181, 54, 204, 0.15);
+    border-radius: 12px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tutorial-nav-item:hover {
+    background: rgba(181, 54, 204, 0.1);
+    transform: translateX(10px); /* The "slide" effect from your wireframe */
+    border-color: var(--brand-purple);
+}
+
+/* Active state for the currently selected video */
+.tutorial-nav-item.active {
+    background: rgba(181, 54, 204, 0.15);
+    border-color: var(--brand-purple);
+    box-shadow: 0 0 15px rgba(181, 54, 204, 0.2);
+}
+
+.tutorial-nav-item h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFFFFF;
 }
 
 .section-title {
@@ -252,52 +313,17 @@
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
-.tutorial-content-wrapper {
-    display: flex;
-    gap: 40px;
-    align-items: flex-start;
-}
-
-.tutorial-list {
-    flex: 1; /* Takes up less space than the video */
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.tutorial-item {
-    background: rgba(181, 54, 204, 0.05);
-    border: 1px solid rgba(181, 54, 204, 0.15);
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.tutorial-item:hover {
-    background: rgba(181, 54, 204, 0.15);
-    border-color: #B536CC;
-    transform: translateX(10px);
-}
-
-.tutorial-item h3 {
-    font-size: 18px;
-    color: #E8E8E8;
-}
-
 /* Right Side Player Box */
 .tutorial-video-display {
-    flex: 1.5; /* Makes the video box larger */
+    flex: 2; /* Makes the video box larger */
 }
 
 .video-player {
     position: relative;
+    width: 100%;
     aspect-ratio: 16 / 9;
     background: #000;
-    border-radius: 16px;
+    border-radius: 20px;
     border: 1px solid rgba(181, 54, 204, 0.3);
     overflow: hidden;
     display: flex;
@@ -337,8 +363,15 @@
 /* ==========================================================================
    7. FAQ SECTION
    ========================================================================== */
-.faq {
+.faq-section {
     padding: 100px 0;
+    background: var(--dark-bg);
+}
+
+.faq-container-wrapper {
+    max-width: 900px; /* Narrower for better reading flow */
+    margin: 0 auto;
+    padding: 0 24px;
 }
 
 .faq-list {
@@ -426,9 +459,14 @@
 /* ==========================================================================
    8. FEEDBACK SECTION
    ========================================================================== */
-.feedback {
+.feedback-section {
     padding: 100px 0;
     background: rgba(10, 10, 11, 0.5);
+}
+.feedback-container-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
 }
 
 .feedback-form {
@@ -535,7 +573,7 @@
 /* ==========================================================================
    10. RESPONSIVE MEDIA QUERIES
    ========================================================================== */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .logo-img {
         height: 55px;
     }
@@ -585,13 +623,12 @@
     .ai-highlight-box {
         padding: 20px;
     }
-
-    .tutorial-content-wrapper {
-        flex-direction: column;
-    }
     
+    .tutorial-showcase-layout {
+        flex-direction: column; /* Stacks the sidebar and video */
+    }
     .tutorial-video-display {
         width: 100%;
-        order: -1; /* Puts video on top on mobile */
+        order: -1; /* Forces the video to appear ABOVE the list on mobile */
     }
 }

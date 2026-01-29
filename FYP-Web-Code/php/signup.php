@@ -248,87 +248,50 @@
         }
     </script>
 
-    <?php
-    // PHP Backend Logic
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Get POST data
-        $firstName = isset($_POST['first_name']) ? trim($_POST['first_name']) : '';
-        $lastName = isset($_POST['last_name']) ? trim($_POST['last_name']) : '';
-        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-        $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-        $confirmPassword = isset($_POST['confirm_password']) ? trim($_POST['confirm_password']) : '';
-        $agreeTerms = isset($_POST['agree_terms']) ? true : false;
-        
-        // Validate input
-        if (empty($firstName) || empty($lastName) || empty($email) || empty($password)) {
+        <?php
+        // --- TOP OF FILE: Logic Header ---
+        require_once 'db.php';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Please fill in all fields']);
-            exit;
+            
+            // 1. Collect and Clean Data
+            $firstName = trim($_POST['first_name'] ?? '');
+            $lastName  = trim($_POST['last_name'] ?? '');
+            $email     = trim($_POST['email'] ?? '');
+            $password  = $_POST['password'] ?? '';
+            $confirm   = $_POST['confirm_password'] ?? '';
+
+            // 2. Validation
+            if (empty($firstName) || empty($email) || strlen($password) < 8) {
+                echo json_encode(['success' => false, 'message' => 'Please fill all fields. Password must be 8+ chars.']);
+                exit;
+            }
+
+            if ($password !== $confirm) {
+                echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
+                exit;
+            }
+
+            // 3. Database Operation
+            try {
+                $hash = password_hash($password, PASSWORD_BCRYPT);
+                $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password_hash) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$firstName, $lastName, $email, $hash]);
+
+                echo json_encode(['success' => true, 'message' => 'Account created! Redirecting...']);
+            } catch (PDOException $e) {
+                if ($e->getCode() == 23000) { // Integrity constraint violation (duplicate email)
+                    echo json_encode(['success' => false, 'message' => 'Email already registered.']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Database error.']);
+                }
+            }
+            exit; // Stop execution so no HTML is sent during an AJAX request
         }
-        
-        // Validate email format
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Invalid email format']);
-            exit;
-        }
-        
-        // Validate passwords match
-        if ($password !== $confirmPassword) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Passwords do not match']);
-            exit;
-        }
-        
-        // Validate password strength
-        if (strlen($password) < 8) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters long']);
-            exit;
-        }
-        
-        // Validate terms acceptance
-        if (!$agreeTerms) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'You must agree to the Terms of Service']);
-            exit;
-        }
-        
-        // TODO: Replace with actual database operations
-        // Example: Check if email already exists
-        // $existingUser = getUserByEmail($email);
-        // if ($existingUser) {
-        //     header('Content-Type: application/json');
-        //     echo json_encode(['success' => false, 'message' => 'Email already registered']);
-        //     exit;
-        // }
-        
-        // Hash the password
-        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-        
-        // TODO: Insert user into database
-        // Example:
-        // $userId = createUser([
-        //     'first_name' => $firstName,
-        //     'last_name' => $lastName,
-        //     'email' => $email,
-        //     'password_hash' => $passwordHash,
-        //     'created_at' => date('Y-m-d H:i:s')
-        // ]);
-        
-        // Temporary success response (REPLACE THIS)
-        // In production, you would:
-        // 1. Insert user into database
-        // 2. Send verification email
-        // 3. Return success response
-        
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => true, 
-            'message' => 'Account created successfully! Please check your email to verify your account.'
-        ]);
-        exit;
-    }
-    ?>
+        ?>
+
+<!DOCTYPE html>
+<html lang="en">
 </body>
 </html>

@@ -1,82 +1,47 @@
 <?php
+require_once 'db.php';
 session_start();
 
-// Check if user is logged in and is admin
-// Uncomment and modify based on your authentication system
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-//     header('Location: login.php');
-//     exit;
-// }
+// 1. Secure the page
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: login.php');
+    exit;
+}
 
-// Sample data - Replace with actual database queries
-$totalUsers = 1248;
-$onlineUsers = 42;
-$totalFeedback = 156;
+try {
+    // 2. Fetch Real Stats
+    $totalUsers = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'user'")->fetchColumn();
+    // For now, we'll count everyone as "Online" if they have a session, 
+    // but typically you'd check a 'last_login' timestamp.
+    $onlineUsers = 1; 
+    $totalFeedback = 0; // Set to 0 until you build a feedback table
 
-// Sample user data
-$users = [
-    ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'status' => 'online', 'joined' => '2024-01-15'],
-    ['id' => 2, 'name' => 'Sarah Miller', 'email' => 'sarah@example.com', 'status' => 'offline', 'joined' => '2024-01-20'],
-    ['id' => 3, 'name' => 'Mike Johnson', 'email' => 'mike@example.com', 'status' => 'online', 'joined' => '2024-02-01'],
-    ['id' => 4, 'name' => 'Emily Davis', 'email' => 'emily@example.com', 'status' => 'offline', 'joined' => '2024-02-10'],
-    ['id' => 5, 'name' => 'David Wilson', 'email' => 'david@example.com', 'status' => 'online', 'joined' => '2024-02-15'],
-];
+    // 3. Fetch Real User List
+    $stmt = $pdo->query("SELECT id, first_name, last_name, email, created_at FROM users ORDER BY created_at DESC");
+    $db_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Sample online users
-$onlineUsersList = array_filter($users, function($user) {
-    return $user['status'] === 'online';
-});
+    // Format the database users to match your template's array structure
+    $users = [];
+    foreach ($db_users as $u) {
+        $users[] = [
+            'id' => $u['id'],
+            'name' => $u['first_name'] . ' ' . $u['last_name'],
+            'email' => $u['email'],
+            'status' => 'online', // Default for now
+            'joined' => $u['created_at']
+        ];
+    }
 
-// Sample feedback data
+    // Filter for online users (demo logic)
+    $onlineUsersList = $users; 
+
+} catch (PDOException $e) {
+    die("Database Error: " . $e->getMessage());
+}
+
+// Keep your sample feedback array for now so the UI doesn't look empty
 $feedbacks = [
-    [
-        'id' => 1,
-        'user' => 'Alex Thompson',
-        'avatar' => 'AT',
-        'rating' => 5,
-        'text' => 'OptiPlan has completely transformed how I manage my daily tasks. The interface is intuitive and the features are exactly what I needed!',
-        'date' => '2 hours ago'
-    ],
-    [
-        'id' => 2,
-        'user' => 'Maria Garcia',
-        'avatar' => 'MG',
-        'rating' => 4,
-        'text' => 'Great platform for students! The budget tracking feature helped me stay on top of my finances throughout the semester.',
-        'date' => '5 hours ago'
-    ],
-    [
-        'id' => 3,
-        'user' => 'James Chen',
-        'avatar' => 'JC',
-        'rating' => 5,
-        'text' => 'The study scheduler is brilliant. I love how it integrates with my calendar and reminds me of upcoming deadlines.',
-        'date' => '1 day ago'
-    ],
-    [
-        'id' => 4,
-        'user' => 'Lisa Brown',
-        'avatar' => 'LB',
-        'rating' => 4,
-        'text' => 'Very helpful for organizing my work and personal life. Would love to see more customization options in the future.',
-        'date' => '2 days ago'
-    ],
-    [
-        'id' => 5,
-        'user' => 'Robert Lee',
-        'avatar' => 'RL',
-        'rating' => 5,
-        'text' => 'Outstanding tool for productivity! The dashboard gives me a clear overview of everything I need to focus on.',
-        'date' => '3 days ago'
-    ],
-    [
-        'id' => 6,
-        'user' => 'Sophie Martin',
-        'avatar' => 'SM',
-        'rating' => 5,
-        'text' => 'As a young professional, OptiPlan helps me balance work deadlines and personal goals seamlessly. Highly recommended!',
-        'date' => '4 days ago'
-    ],
+    ['id' => 1, 'user' => 'System', 'avatar' => 'S', 'rating' => 5, 'text' => 'Database connected successfully!', 'date' => 'Just now']
 ];
 ?>
 <!DOCTYPE html>
@@ -130,7 +95,7 @@ $feedbacks = [
 
             <!-- Sidebar Footer -->
             <div class="sidebar-footer">
-                <a href="../php/index.php" class="admin-profile" onclick="return handleLogout(event)">
+                <a href="logout.php" class="admin-profile" onclick="handleLogout(event)">
                     <div class="admin-avatar">AD</div>
                     <div class="admin-info">
                         <div class="admin-name">Admin User</div>

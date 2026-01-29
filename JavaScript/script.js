@@ -356,3 +356,21 @@ function smoothScrollTo(targetId) {
         });
     }
 }
+
+/* ==========================================
+   ADDITIONAL UTILITY FUNCTIONS
+   ========================================== */
+
+function setButtonLoading(buttonSelector, isLoading) {
+    const btn = document.querySelector(buttonSelector);
+    if (!btn) return;
+    
+    if (isLoading) {
+        btn.disabled = true;
+        btn.dataset.originalText = btn.innerHTML;
+        btn.innerHTML = 'Processing...'; 
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.originalText || 'Submit';
+    }
+}

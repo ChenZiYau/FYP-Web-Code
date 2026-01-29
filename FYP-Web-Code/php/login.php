@@ -1,3 +1,41 @@
+<?php
+// --- TOP OF FILE: Logic Header ---
+require_once 'db.php';
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['password_hash'])) {
+            // Store data in Session
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role'] = $user['role']; 
+            $_SESSION['name'] = $user['first_name'];
+
+            // Determine redirect target based on role
+            $redirect = ($user['role'] === 'admin') ? 'admin.php' : 'dashboard.php';
+
+            echo json_encode([
+                'success' => true, 
+                'redirect' => $redirect
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
+        }
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+    }
+    exit; // Stop here so no HTML is sent during the AJAX request
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -138,9 +176,10 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            setButtonLoading('.btn-submit', true); 
+            
             const formData = new FormData(this);
             
-            // Send AJAX request to login.php
             fetch('login.php', {
                 method: 'POST',
                 body: formData
@@ -148,15 +187,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard.php';
+                    window.location.href = data.redirect || 'dashboard.php';
                 } else {
                     showError(data.message || 'Invalid email or password');
+                    setButtonLoading('.btn-submit', false); 
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 showError('An error occurred. Please try again.');
+
+                setButtonLoading('.btn-submit', false); 
             });
         });
 
@@ -166,56 +207,21 @@
             alert(`Redirecting to ${provider} authentication...`);
             // Implement actual OAuth flow here
             // window.location.href = 'auth/' + provider;
+        }   
+
+        function setButtonLoading(buttonSelector, isLoading) {
+            const btn = document.querySelector(buttonSelector);
+            if (!btn) return;
+            
+            if (isLoading) {
+                btn.disabled = true;
+                btn.dataset.originalText = btn.innerHTML;
+                btn.innerHTML = 'Processing...'; 
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.originalText || 'Sign In';
+            }
         }
     </script>
-
-    <?php
-    // PHP Backend Logic
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Get POST data
-        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-        $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-        $remember = isset($_POST['remember']) ? true : false;
-        
-        // Validate input
-        if (empty($email) || empty($password)) {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Please fill in all fields']);
-            exit;
-        }
-        
-        // TODO: Replace with actual database authentication
-        // Example: Query database for user
-        // $user = getUserByEmail($email);
-        // if ($user && password_verify($password, $user['password_hash'])) {
-        
-        // Temporary authentication logic (REPLACE THIS)
-        if ($email === 'demo@optiplan.com' && $password === 'password123') {
-            // Start session
-            session_start();
-            
-            // Set session variables
-            $_SESSION['user_id'] = 1;
-            $_SESSION['email'] = $email;
-            $_SESSION['logged_in'] = true;
-            
-            // Handle remember me
-            if ($remember) {
-                // Set cookie for 30 days
-                $token = bin2hex(random_bytes(32));
-                setcookie('remember_token', $token, time() + (30 * 24 * 60 * 60), '/');
-                // TODO: Store token in database
-            }
-            
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'message' => 'Login successful']);
-            exit;
-        } else {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Invalid email or password']);
-            exit;
-        }
-    }
-    ?>
 </body>
 </html>

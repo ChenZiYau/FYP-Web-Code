@@ -37,13 +37,19 @@
                     </ul>
                 </li>
                 <li class="nav-item">
+                    <a href="#problem" class="nav-link">The Problems</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#features" class="nav-link">Features</a>
+                </li>
+                <li class="nav-item">
                     <a href="#tutorial" class="nav-link">Tutorial Video</a>
                 </li>
                 <li class="nav-item">
                     <a href="#faq" class="nav-link">FAQ</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#feedbacks" class="nav-link">Feedbacks</a>
+                    <a href="#form" class="nav-link">Feedback Form</a>
                 </li>
             </ul>
 
@@ -125,97 +131,7 @@
             </div>
         </section>
 
-        <!-- Problem Statement Section -->
-        <section class="section problem-section">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-label">The Problem</span>
-                    <h2 class="section-title">Fragmented Productivity is Killing Your Time</h2>
-                </div>
-                <div class="problem-grid">
-                    <div class="problem-card">
-                        <div class="problem-number">01</div>
-                        <h3>App Overload</h3>
-                        <p>Constantly switching between calendar apps, study tools, and budget trackers wastes valuable time and mental energy.</p>
-                    </div>
-                    <div class="problem-card">
-                        <div class="problem-number">02</div>
-                        <h3>Missed Tasks</h3>
-                        <p>Important deadlines and activities fall through the cracks when scattered across multiple disconnected platforms.</p>
-                    </div>
-                    <div class="problem-card">
-                        <div class="problem-number">03</div>
-                        <h3>No Integration</h3>
-                        <p>Your schedule doesn't talk to your budget. Your study plan doesn't sync with your calendar. Everything exists in silos.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section class="section features-section">
-            <div class="container">
-                <div class="section-header centered">
-                    <span class="section-label">Features</span>
-                    <h2 class="section-title">Three Tools. One Platform. Zero Hassle.</h2>
-                    <p class="section-description">Everything you need to stay organized, productive, and financially aware.</p>
-                </div>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 48 48" fill="none">
-                                <rect x="8" y="12" width="32" height="28" rx="2" stroke="currentColor" stroke-width="2"/>
-                                <path d="M8 18H40" stroke="currentColor" stroke-width="2"/>
-                                <circle cx="18" cy="26" r="2" fill="currentColor"/>
-                                <circle cx="24" cy="26" r="2" fill="currentColor"/>
-                                <circle cx="30" cy="26" r="2" fill="currentColor"/>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Smart Scheduling</h3>
-                        <p class="feature-description">AI-powered calendar that learns your habits and suggests optimal time slots for tasks, classes, and breaks.</p>
-                        <ul class="feature-list">
-                            <li>Automatic conflict detection</li>
-                            <li>Smart time blocking</li>
-                            <li>Integration with university schedules</li>
-                        </ul>
-                    </div>
-                    <div class="feature-card featured">
-                        <div class="featured-badge">Most Popular</div>
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 48 48" fill="none">
-                                <path d="M14 8H34C36.2091 8 38 9.79086 38 12V38C38 40.2091 36.2091 42 34 42H14C11.7909 42 10 40.2091 10 38V12C10 9.79086 11.7909 8 14 8Z" stroke="currentColor" stroke-width="2"/>
-                                <path d="M18 16H30M18 24H30M18 32H26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Study Support</h3>
-                        <p class="feature-description">Personalized study plans, progress tracking, and AI-powered insights to improve your academic performance.</p>
-                        <ul class="feature-list">
-                            <li>Custom study schedules</li>
-                            <li>Progress analytics</li>
-                            <li>Smart revision reminders</li>
-                        </ul>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 48 48" fill="none">
-                                <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2"/>
-                                <path d="M24 24L24 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <path d="M24 24L32 28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h3 class="feature-title">Budget Tracking</h3>
-                        <p class="feature-description">Track expenses, set savings goals, and gain financial awareness with intuitive budgeting tools.</p>
-                        <ul class="feature-list">
-                            <li>Expense categorization</li>
-                            <li>Visual spending insights</li>
-                            <li>Savings goal tracking</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- About OptiPlan Section -->
+                <!-- About OptiPlan Section -->
         <section class="section about-section" id="about-me">
             <div class="container">
                 <div class="about-me-content">
@@ -281,6 +197,96 @@
                                 <span>Student-First Design</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem Statement Section -->
+        <section class="section problem-section" id="problem">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">The Problem</span>
+                    <h2 class="section-title">Fragmented Productivity is Killing Your Time</h2>
+                </div>
+                <div class="problem-grid">
+                    <div class="problem-card">
+                        <div class="problem-number">01</div>
+                        <h3>App Overload</h3>
+                        <p>Constantly switching between calendar apps, study tools, and budget trackers wastes valuable time and mental energy.</p>
+                    </div>
+                    <div class="problem-card">
+                        <div class="problem-number">02</div>
+                        <h3>Missed Tasks</h3>
+                        <p>Important deadlines and activities fall through the cracks when scattered across multiple disconnected platforms.</p>
+                    </div>
+                    <div class="problem-card">
+                        <div class="problem-number">03</div>
+                        <h3>No Integration</h3>
+                        <p>Your schedule doesn't talk to your budget. Your study plan doesn't sync with your calendar. Everything exists in silos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="section features-section" id="features">
+            <div class="container">
+                <div class="section-header centered">
+                    <span class="section-label">Features</span>
+                    <h2 class="section-title">Three Tools. One Platform. Zero Hassle.</h2>
+                    <p class="section-description">Everything you need to stay organized, productive, and financially aware.</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <rect x="8" y="12" width="32" height="28" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <path d="M8 18H40" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="18" cy="26" r="2" fill="currentColor"/>
+                                <circle cx="24" cy="26" r="2" fill="currentColor"/>
+                                <circle cx="30" cy="26" r="2" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Smart Scheduling</h3>
+                        <p class="feature-description">AI-powered calendar that learns your habits and suggests optimal time slots for tasks, classes, and breaks.</p>
+                        <ul class="feature-list">
+                            <li>Automatic conflict detection</li>
+                            <li>Smart time blocking</li>
+                            <li>Integration with university schedules</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card featured">
+                        <div class="featured-badge">Most Popular</div>
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M14 8H34C36.2091 8 38 9.79086 38 12V38C38 40.2091 36.2091 42 34 42H14C11.7909 42 10 40.2091 10 38V12C10 9.79086 11.7909 8 14 8Z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M18 16H30M18 24H30M18 32H26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Study Support</h3>
+                        <p class="feature-description">Personalized study plans, progress tracking, and AI-powered insights to improve your academic performance.</p>
+                        <ul class="feature-list">
+                            <li>Custom study schedules</li>
+                            <li>Progress analytics</li>
+                            <li>Smart revision reminders</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2"/>
+                                <path d="M24 24L24 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M24 24L32 28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Budget Tracking</h3>
+                        <p class="feature-description">Track expenses, set savings goals, and gain financial awareness with intuitive budgeting tools.</p>
+                        <ul class="feature-list">
+                            <li>Expense categorization</li>
+                            <li>Visual spending insights</li>
+                            <li>Savings goal tracking</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -379,6 +385,58 @@
             </div>
         </section>
 
+        <!-- FeedbackForm Section -->
+        <section class="section feedback-form-section" id="form">
+            <div class="container">
+                <div class="section-header centered">
+                    <span class="section-label">Contact Us</span>
+                    <h2 class="section-title">We Value Your Feedback</h2>
+                    <p class="section-description">Have a suggestion or found a bug? Let us know how we can improve OptiPlan for you.</p>
+                </div>
+                
+                <div class="form-wrapper">
+                    <form class="contact-form" action="#" method="POST">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" name="name" placeholder="Your Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category">Topic</label>
+                            <select id="category" name="category">
+                                <option value="general">General Feedback</option>
+                                <option value="bug">Report a Bug</option>
+                                <option value="feature">Feature Request</option>
+                                <option value="support">Help & Support</option>
+                            </select>
+                            <svg class="select-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" placeholder="Tell us what you think..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-submit">
+                            Send Feedback
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
         <!-- Feedbacks Section -->
         <section class="section feedbacks-section" id="feedbacks">
             <div class="container">
@@ -432,22 +490,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- CTA Section -->
-        <section class="section cta-section" id="try-now">
-            <div class="container">
-                <div class="cta-content">
-                    <h2 class="cta-title">Ready to Get Organized?</h2>
-                    <p class="cta-description">Join thousands of students who've transformed their productivity with OptiPlan.</p>
-                    <div class="cta-actions">
-                        <a href="#" class="btn-cta-primary">Start Free Today</a>
-                        <a href="#tutorial" class="btn-cta-secondary">Watch Tutorial</a>
-                    </div>
-                    <p class="cta-note">No credit card required • Free forever plan available</p>
-                </div>
-            </div>
-        </section>
-    </main>
 
     <!-- Footer -->
     <footer class="footer">

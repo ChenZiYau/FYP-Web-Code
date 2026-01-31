@@ -322,7 +322,22 @@ img {
    HERO SECTION
    ========================================== */
 .hero {
-    padding: 10rem var(--container-padding) 6rem;
+/* 1. Force the section to take at least 100% of the screen height */
+    min-height: 100vh;
+    
+    /* 2. Use Flexbox to center the content vertically within that full height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    /* 3. Adjust padding: 
+       - Top: 80px (to account for the fixed header) 
+       - Side: variable 
+       - Bottom: 0 (since content is centered) 
+    */
+    padding: 80px var(--container-padding) 0;
+    
+    /* Keep your existing visual styles */
     background: var(--dark-bg);
     position: relative;
     overflow: hidden;
@@ -510,7 +525,7 @@ img {
 }
 
 .card-2 {
-    top: 50%;
+    top: 44%;
     right: 10%;
     animation-delay: 0.5s;
 }
@@ -947,6 +962,11 @@ img {
     transition: all var(--transition-base);
 }
 
+/* Removes the focus outline from the FAQ question button */
+.faq-question:focus:not(:focus-visible) {
+    outline: none;
+}
+
 .faq-question:hover {
     color: var(--primary-purple);
 }
@@ -1043,71 +1063,134 @@ img {
 }
 
 /* ==========================================
-   CTA SECTION
+   FEEDBACK FORM SECTION
    ========================================== */
-.cta-section {
-    background: var(--gradient-primary);
-    color: var(--white);
-    text-align: center;
+.feedback-form-section {
+    background: var(--dark-bg);
+    position: relative;
+    padding-bottom: 6rem;
 }
 
-.cta-content {
+/* Add a subtle gradient glow behind the form */
+.feedback-form-section::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.form-wrapper {
     max-width: 700px;
     margin: 0 auto;
+    background: rgba(26, 22, 37, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    border-radius: var(--radius-xl);
+    padding: 3rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
 }
 
-.cta-title {
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    color: var(--white);
-}
-
-.cta-description {
-    font-size: 1.25rem;
-    margin-bottom: 2.5rem;
-    opacity: 0.95;
-}
-
-.cta-actions {
+.contact-form {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.btn-cta-primary,
-.btn-cta-secondary {
-    padding: 1rem 2rem;
-    font-size: 1rem;
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.form-group label {
+    font-size: 0.875rem;
     font-weight: 600;
+    color: var(--gray-400);
+    margin-left: 0.25rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(167, 139, 250, 0.2);
     border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--white);
     transition: all var(--transition-base);
 }
 
-.btn-cta-primary {
-    background: var(--white);
-    color: var(--primary-purple);
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
 }
 
-.btn-cta-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
+/* Custom styling for Select dropdown */
+.form-group select {
+    appearance: none;
+    cursor: pointer;
 }
 
-.btn-cta-secondary {
-    background: transparent;
-    color: var(--white);
-    border: 2px solid var(--white);
+.select-icon {
+    position: absolute;
+    right: 1rem;
+    top: 2.5rem; /* Adjust based on label height + padding */
+    pointer-events: none;
+    color: var(--gray-500);
 }
 
-.btn-cta-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
+/* Focus States */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    background: rgba(167, 139, 250, 0.05);
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1);
 }
 
-.cta-note {
-    font-size: 0.875rem;
-    opacity: 0.9;
+/* Submit Button Customization */
+.btn-submit {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    width: 100%;
+    justify-content: center;
+}
+
+/* Responsive adjustments for the form */
+@media (max-width: 640px) {
+    .form-wrapper {
+        padding: 1.5rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
 }
 
 /* ==========================================

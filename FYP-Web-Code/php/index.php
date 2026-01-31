@@ -230,15 +230,19 @@
         </section>
 
         <!-- Features Section -->
-        <section class="section features-section" id="features">
-            <div class="container">
-                <div class="section-header centered">
-                    <span class="section-label">Features</span>
-                    <h2 class="section-title">Three Tools. One Platform. Zero Hassle.</h2>
-                    <p class="section-description">Everything you need to stay organized, productive, and financially aware.</p>
-                </div>
-                <div class="features-grid">
-                    <div class="feature-card">
+<section class="section features-section" id="features">
+    <div class="container">
+        <div class="section-header centered">
+            <span class="section-label">Features</span>
+            <h2 class="section-title">Three Tools. One Platform. Zero Hassle.</h2>
+            <p class="section-description">Everything you need to stay organized, productive, and financially aware.</p>
+        </div>
+        <div class="features-grid">
+            <!-- Feature Card 1 -->
+            <div class="feature-card flip-card">
+                <div class="flip-card-inner">
+                    <!-- Front -->
+                    <div class="flip-card-front">
                         <div class="feature-icon">
                             <svg viewBox="0 0 48 48" fill="none">
                                 <rect x="8" y="12" width="32" height="28" rx="2" stroke="currentColor" stroke-width="2"/>
@@ -256,7 +260,24 @@
                             <li>Integration with university schedules</li>
                         </ul>
                     </div>
-                    <div class="feature-card featured">
+                    <!-- Back -->
+                    <div class="flip-card-back">
+                        <h3 class="feature-title">Smart Scheduling Plus</h3>
+                        <p class="feature-description">Advanced analytics and suggestions for peak productivity and time optimization.</p>
+                        <ul class="feature-list">
+                            <li>Priority task recommendations</li>
+                            <li>AI-generated daily agenda</li>
+                            <li>Integration with multiple calendars</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Card 2 (Featured) -->
+            <div class="feature-card featured flip-card">
+                <div class="flip-card-inner">
+                    <!-- Front -->
+                    <div class="flip-card-front">
                         <div class="featured-badge">Most Popular</div>
                         <div class="feature-icon">
                             <svg viewBox="0 0 48 48" fill="none">
@@ -272,7 +293,24 @@
                             <li>Smart revision reminders</li>
                         </ul>
                     </div>
-                    <div class="feature-card">
+                    <!-- Back -->
+                    <div class="flip-card-back">
+                        <h3 class="feature-title">Study Support Plus</h3>
+                        <p class="feature-description">AI tutors and collaborative study tools for maximum learning efficiency.</p>
+                        <ul class="feature-list">
+                            <li>AI-generated practice quizzes</li>
+                            <li>Peer study group recommendations</li>
+                            <li>Real-time progress feedback</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Card 3 -->
+            <div class="feature-card flip-card">
+                <div class="flip-card-inner">
+                    <!-- Front -->
+                    <div class="flip-card-front">
                         <div class="feature-icon">
                             <svg viewBox="0 0 48 48" fill="none">
                                 <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2"/>
@@ -288,9 +326,21 @@
                             <li>Savings goal tracking</li>
                         </ul>
                     </div>
+                    <!-- Back -->
+                    <div class="flip-card-back">
+                        <h3 class="feature-title">Budget Tracking Plus</h3>
+                        <p class="feature-description">Detailed financial insights and automated saving recommendations.</p>
+                        <ul class="feature-list">
+                            <li>Spending trend analysis</li>
+                            <li>Automated savings suggestions</li>
+                            <li>Custom alerts for overspending</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
 
         <!-- Tutorial Video Section -->
         <section class="section tutorial-section" id="tutorial">

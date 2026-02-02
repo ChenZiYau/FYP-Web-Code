@@ -1,3 +1,58 @@
+<?php
+// --- TOP OF FILE: Logic Header ---
+require_once 'db.php';
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+
+    // 1. Collect and Clean Data
+    $firstName = trim($_POST['first_name'] ?? '');
+    $lastName  = trim($_POST['last_name'] ?? '');
+    $email     = trim($_POST['email'] ?? '');
+    $password  = $_POST['password'] ?? '';
+    $confirm   = $_POST['confirm_password'] ?? '';
+
+    // 2. Validation
+    if (empty($firstName) || empty($email) || strlen($password) < 8) {
+        echo json_encode(['success' => false, 'message' => 'Please fill all fields. Password must be 8+ chars.']);
+        exit;
+    }
+
+    if ($password !== $confirm) {
+        echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
+        exit;
+    }
+
+    // 3. Database Operation
+    try {
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password_hash) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$firstName, $lastName, $email, $hash]);
+
+        // Get the newly created user's ID
+        $userId = $pdo->lastInsertId();
+
+        // Automatically log in the user
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['role'] = 'user';
+        $_SESSION['name'] = $firstName;
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Account created! Redirecting to dashboard...',
+            'redirect' => 'dashboard.php'
+        ]);
+    } catch (PDOException $e) {
+        if ($e->getCode() == 23000) { // Integrity constraint violation (duplicate email)
+            echo json_encode(['success' => false, 'message' => 'Email already registered.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Database error.']);
+        }
+    }
+    exit; // Stop execution so no HTML is sent during an AJAX request
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,27 +90,27 @@
 
                 <div class="error-message" id="errorMessage"></div>
                 <div class="success-message" id="successMessage"></div>
-                
+
                 <form class="auth-form" method="POST" action="signup.php" id="signupForm">
                     <div class="form-group row">
                         <div>
                             <label class="form-label" for="firstName">First name</label>
-                            <input 
-                                type="text" 
-                                id="firstName" 
+                            <input
+                                type="text"
+                                id="firstName"
                                 name="first_name"
-                                class="form-input" 
+                                class="form-input"
                                 placeholder="John"
                                 required
                             />
                         </div>
                         <div>
                             <label class="form-label" for="lastName">Last name</label>
-                            <input 
-                                type="text" 
-                                id="lastName" 
+                            <input
+                                type="text"
+                                id="lastName"
                                 name="last_name"
-                                class="form-input" 
+                                class="form-input"
                                 placeholder="Doe"
                                 required
                             />
@@ -64,11 +119,11 @@
 
                     <div class="form-group">
                         <label class="form-label" for="email">Email address</label>
-                        <input 
-                            type="email" 
-                            id="email" 
+                        <input
+                            type="email"
+                            id="email"
                             name="email"
-                            class="form-input" 
+                            class="form-input"
                             placeholder="you@example.com"
                             required
                         />
@@ -77,11 +132,11 @@
                     <div class="form-group">
                         <label class="form-label" for="password">Password</label>
                         <div class="password-input-wrapper">
-                            <input 
-                                type="password" 
-                                id="password" 
+                            <input
+                                type="password"
+                                id="password"
                                 name="password"
-                                class="form-input" 
+                                class="form-input"
                                 placeholder="Create a strong password"
                                 required
                                 minlength="8"
@@ -98,11 +153,11 @@
                     <div class="form-group">
                         <label class="form-label" for="confirmPassword">Confirm password</label>
                         <div class="password-input-wrapper">
-                            <input 
-                                type="password" 
-                                id="confirmPassword" 
+                            <input
+                                type="password"
+                                id="confirmPassword"
                                 name="confirm_password"
-                                class="form-input" 
+                                class="form-input"
                                 placeholder="Re-enter your password"
                                 required
                                 minlength="8"
@@ -154,7 +209,7 @@
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById('eyeIcon-' + inputId);
-            
+
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.innerHTML = `
@@ -192,31 +247,31 @@
         // Client-side validation
         document.getElementById('signupForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const agreeTerms = document.getElementById('agreeTerms').checked;
-            
+
             // Validate passwords match
             if (password !== confirmPassword) {
                 showError('Passwords do not match');
                 return;
             }
-            
+
             // Validate password strength
             if (password.length < 8) {
                 showError('Password must be at least 8 characters long');
                 return;
             }
-            
+
             // Validate terms acceptance
             if (!agreeTerms) {
                 showError('You must agree to the Terms of Service');
                 return;
             }
-            
+
             const formData = new FormData(this);
-            
+
             // Send AJAX request to signup.php
             fetch('signup.php', {
                 method: 'POST',
@@ -225,10 +280,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showSuccess(data.message || 'Account created successfully! Redirecting to login...');
+                    showSuccess(data.message || 'Account created successfully! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = 'login.php';
-                    }, 2000);
+                        window.location.href = data.redirect || 'dashboard.php';
+                    }, 1500);
                 } else {
                     showError(data.message || 'Registration failed. Please try again.');
                 }
@@ -247,51 +302,5 @@
             // window.location.href = 'auth/' + provider;
         }
     </script>
-
-        <?php
-        // --- TOP OF FILE: Logic Header ---
-        require_once 'db.php';
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            header('Content-Type: application/json');
-            
-            // 1. Collect and Clean Data
-            $firstName = trim($_POST['first_name'] ?? '');
-            $lastName  = trim($_POST['last_name'] ?? '');
-            $email     = trim($_POST['email'] ?? '');
-            $password  = $_POST['password'] ?? '';
-            $confirm   = $_POST['confirm_password'] ?? '';
-
-            // 2. Validation
-            if (empty($firstName) || empty($email) || strlen($password) < 8) {
-                echo json_encode(['success' => false, 'message' => 'Please fill all fields. Password must be 8+ chars.']);
-                exit;
-            }
-
-            if ($password !== $confirm) {
-                echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
-                exit;
-            }
-
-            // 3. Database Operation
-            try {
-                $hash = password_hash($password, PASSWORD_BCRYPT);
-                $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password_hash) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$firstName, $lastName, $email, $hash]);
-
-                echo json_encode(['success' => true, 'message' => 'Account created! Redirecting...']);
-            } catch (PDOException $e) {
-                if ($e->getCode() == 23000) { // Integrity constraint violation (duplicate email)
-                    echo json_encode(['success' => false, 'message' => 'Email already registered.']);
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Database error.']);
-                }
-            }
-            exit; // Stop execution so no HTML is sent during an AJAX request
-        }
-        ?>
-
-<!DOCTYPE html>
-<html lang="en">
 </body>
 </html>

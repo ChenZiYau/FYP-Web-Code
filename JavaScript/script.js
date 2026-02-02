@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         lastScroll = currentScroll;
     });
-    
-    
+
+
     // ==========================================
     // SMOOTH SCROLLING FOR NAVIGATION LINKS
     // ==========================================
@@ -127,6 +127,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     
+    // ==========================================
+    // USER MENU DROPDOWN (LOGGED IN STATE)
+    // ==========================================
+    const userMenu = document.getElementById('userMenu');
+    const userMenuTrigger = document.getElementById('userMenuTrigger');
+
+    if (userMenuTrigger && userMenu) {
+        // Toggle user menu on click
+        userMenuTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userMenu.classList.toggle('active');
+        });
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (userMenu && !userMenu.contains(e.target)) {
+                userMenu.classList.remove('active');
+            }
+        });
+
+        // Close user menu on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && userMenu.classList.contains('active')) {
+                userMenu.classList.remove('active');
+            }
+        });
+
+        // Close dropdown when clicking a menu item
+        const dropdownItems = userMenu.querySelectorAll('.dropdown-item');
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function() {
+                userMenu.classList.remove('active');
+            });
+        });
+    }
+
+
     // ==========================================
     // FAQ ACCORDION FUNCTIONALITY
     // ==========================================

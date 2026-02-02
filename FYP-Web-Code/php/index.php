@@ -1,3 +1,9 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+$userName = $_SESSION['name'] ?? '';
+$userRole = $_SESSION['role'] ?? 'user';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,8 +61,52 @@
 
             <!-- Right Action Buttons -->
             <div class="nav-actions">
-                <a href="../php/login.php" class="btn-link">Log In</a>
-                <a href="../php/signup.php" class="btn-primary">Try Now</a>
+                <?php if ($isLoggedIn): ?>
+                <!-- Logged In: User Menu with Dropdown -->
+                <div class="user-menu" id="userMenu">
+                    <button class="user-menu-trigger" id="userMenuTrigger" type="button">
+                        <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
+                        <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                            Dashboard
+                        </a>
+                        <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>#settings" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="logout.php" class="dropdown-item logout">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            Log Out
+                        </a>
+                    </div>
+                </div>
+                <?php else: ?>
+                <!-- Not Logged In: Login/Signup Buttons -->
+                <a href="login.php" class="btn-link">Log In</a>
+                <a href="signup.php" class="btn-primary">Try Now</a>
+                <?php endif; ?>
             </div>
 
             <!-- Mobile Menu Toggle -->
@@ -82,7 +132,11 @@
                         into one intelligent platform designed for students and young professionals.
                     </p>
                     <div class="hero-actions">
-                        <a href="../php/signup.php" class="btn-hero-primary">Get Started Free</a>
+                        <?php if ($isLoggedIn): ?>
+                        <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>" class="btn-hero-primary">Go to Dashboard</a>
+                        <?php else: ?>
+                        <a href="signup.php" class="btn-hero-primary">Get Started Free</a>
+                        <?php endif; ?>
                         <a href="#tutorial" class="btn-hero-secondary">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>

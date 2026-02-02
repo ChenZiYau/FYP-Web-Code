@@ -1405,11 +1405,40 @@ img {
 
 /* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
-    .nav-links,
-    .nav-actions {
+    .nav-links {
         display: none;
     }
-    
+
+    /* Hide login/signup buttons on mobile, keep user menu */
+    .nav-actions > .btn-link,
+    .nav-actions > .btn-primary {
+        display: none;
+    }
+
+    /* Ensure user menu is visible on mobile */
+    .user-menu {
+        display: block !important;
+    }
+
+    .user-menu-trigger {
+        padding: 0.5rem;
+        gap: 0;
+    }
+
+    .user-menu-trigger .user-name,
+    .user-menu-trigger svg.chevron-icon {
+        display: none;
+    }
+
+    .user-menu-trigger svg.user-icon {
+        display: block;
+    }
+
+    .user-dropdown {
+        right: 0;
+        min-width: 160px;
+    }
+
     .mobile-menu-toggle {
         display: flex;
     }
@@ -1511,6 +1540,136 @@ button:focus {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+/* ==========================================
+   USER MENU (LOGGED IN STATE)
+   ========================================== */
+.user-menu {
+    position: relative;
+    z-index: 1000;
+    display: block;
+}
+
+.user-menu-trigger {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background: rgba(167, 139, 250, 0.1);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    border-radius: var(--radius-full);
+    color: var(--gray-200);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.user-menu-trigger:hover {
+    background: rgba(167, 139, 250, 0.15);
+    border-color: var(--primary-purple);
+    color: var(--white);
+}
+
+.user-menu.active .user-menu-trigger {
+    background: rgba(167, 139, 250, 0.2);
+    border-color: var(--primary-purple);
+}
+
+.user-menu-trigger svg.user-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    stroke: var(--primary-purple);
+}
+
+.user-menu-trigger .user-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--gray-200);
+}
+
+.user-menu-trigger svg.chevron-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: transform var(--transition-base);
+    stroke: currentColor;
+}
+
+.user-menu.active .user-menu-trigger svg.chevron-icon {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Panel */
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 180px;
+    background: var(--dark-surface);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.user-menu.active .user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Dropdown Items */
+.user-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem 1rem;
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.user-dropdown .dropdown-item:hover {
+    background: rgba(167, 139, 250, 0.1);
+    color: var(--white);
+}
+
+.user-dropdown .dropdown-item svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    opacity: 0.7;
+    stroke: currentColor;
+}
+
+.user-dropdown .dropdown-item:hover svg {
+    opacity: 1;
+}
+
+.user-dropdown .dropdown-divider {
+    height: 1px;
+    background: rgba(167, 139, 250, 0.15);
+    margin: 0.25rem 0;
+}
+
+.user-dropdown .dropdown-item.logout {
+    color: #f87171;
+}
+
+.user-dropdown .dropdown-item.logout:hover {
+    background: rgba(248, 113, 113, 0.1);
+    color: #ef4444;
 }
 
 /* Print styles */

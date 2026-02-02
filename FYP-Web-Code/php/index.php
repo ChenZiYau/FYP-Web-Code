@@ -13,6 +13,39 @@ $userRole = $_SESSION['role'] ?? 'user';
     <title>OptiPlan - Your All-in-One Productivity Dashboard</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
+        <style>
+            /* Force dropdown icons to 18px regardless of external files */
+            .user-dropdown .dropdown-item svg {
+                width: 18px !important;
+                height: 18px !important;
+                min-width: 18px !important;
+                max-width: 18px !important;
+                display: inline-block !important;
+            }
+
+            .user-dropdown .dropdown-item {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 10px !important;
+                padding: 10px 15px !important;
+                text-decoration: none !important;
+                color: white !important;
+            }
+
+            /* This overrides all external CSS files */
+            #userMenu { position: relative; }
+            #userDropdown { 
+                display: none; 
+                position: absolute; 
+                right: 0; 
+                background: #1a1a2e; 
+                border: 1px solid #333;
+                z-index: 10000;
+            }
+            #userMenu.active #userDropdown { display: block !important; }
+            .dropdown-item svg { width: 18px !important; height: 18px !important; }
+        </style>
 <body>
     <!-- Fixed Header Navigation -->
     <header class="header" id="header">
@@ -64,43 +97,43 @@ $userRole = $_SESSION['role'] ?? 'user';
                 <?php if ($isLoggedIn): ?>
                 <!-- Logged In: User Menu with Dropdown -->
                 <div class="user-menu" id="userMenu">
-                    <button class="user-menu-trigger" id="userMenuTrigger" type="button">
-                        <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
+                <button class="user-menu-trigger" id="userMenuTrigger" type="button">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    
+                    <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
+                    
+                    <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>" class="dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
                         </svg>
-                        <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
-                        <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"></polyline>
+                        <span>Dashboard</span> </a>
+                    <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>#settings" class="dropdown-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                         </svg>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>" class="dropdown-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="14" width="7" height="7"></rect>
-                                <rect x="3" y="14" width="7" height="7"></rect>
-                            </svg>
-                            Dashboard
-                        </a>
-                        <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>#settings" class="dropdown-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                            </svg>
-                            Settings
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="logout.php" class="dropdown-item logout">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                <polyline points="16 17 21 12 16 7"></polyline>
-                                <line x1="21" y1="12" x2="9" y2="12"></line>
-                            </svg>
-                            Log Out
-                        </a>
-                    </div>
+                        <span>Settings</span> </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="logout.php" class="dropdown-item logout">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Log Out</span> </a>
+                </div>
                 </div>
                 <?php else: ?>
                 <!-- Not Logged In: Login/Signup Buttons -->
@@ -663,4 +696,28 @@ $userRole = $_SESSION['role'] ?? 'user';
 
     <script src="../../JavaScript/script.js"></script>
 </body>
+
+// Add this at the very bottom of your PHP file, right before </body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const trigger = document.getElementById('userMenuTrigger');
+    const menu = document.getElementById('userMenu');
+
+    if (trigger && menu) {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            menu.classList.toggle('active');
+            console.log("Menu toggled! Current classes:", menu.className); // Check your console (F12)
+        });
+    }
+
+    // Close when clicking outside
+    document.addEventListener('click', function(e) {
+        if (menu && !menu.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+});
+</script>
 </html>

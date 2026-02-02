@@ -1646,11 +1646,9 @@ button:focus {
 }
 
 .user-dropdown .dropdown-item svg {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    opacity: 0.7;
-    stroke: currentColor;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
 }
 
 .user-dropdown .dropdown-item:hover svg {
@@ -1679,4 +1677,145 @@ button:focus {
     .cta-section {
         display: none;
     }
+}
+
+/* 1. Parent Container */
+#userMenu {
+    position: relative;
+    display: inline-block;
+}
+
+/* 2. The Trigger Button */
+.user-menu-trigger {
+    background: transparent;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.user-menu-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 3. The Dropdown Menu (Hidden by default) */
+#userDropdown {
+    display: none; /* JS will toggle this via the parent class */
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 12px;
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    min-width: 180px;
+    z-index: 9999;
+    padding: 8px 0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* 4. SHOW Logic (Matches your JS: userMenu.classList.toggle('active')) */
+#userMenu.active #userDropdown {
+    display: block !important;
+}
+
+/* 5. Dropdown Items Styling */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: #e2e2e2;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+/* 6. Fix for Icon sizes inside dropdown */
+.dropdown-item svg {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px;
+}
+
+/* 7. Chevron Animation */
+.chevron-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+#userMenu.active .chevron-icon {
+    transform: rotate(180deg);
+}
+
+/* 8. Ensure Nav doesn't hide the dropdown */
+.nav-actions {
+    overflow: visible !important;
+}
+
+/* Layout for the trigger button */
+.user-menu-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px 10px;
+}
+
+/* Size the trigger icons */
+.user-icon, .chevron-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* Style the dropdown menu box */
+#userDropdown { 
+    display: none; 
+    position: absolute; 
+    right: 0; 
+    top: 100%;
+    margin-top: 10px;
+    background: #1a1a2e; 
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    z-index: 10000;
+    min-width: 180px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    padding: 8px 0;
+}
+
+/* Show the menu when parent is active */
+#userMenu.active #userDropdown { 
+    display: block !important; 
+}
+
+/* Align items inside the dropdown */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: rgba(255,255,255,0.05);
 }

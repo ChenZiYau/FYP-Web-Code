@@ -11,7 +11,7 @@
     --deep-purple: #6d28d9;
     --bright-purple: #d8b4fe;
     --neon-purple: #e879f9;
-    
+
     /* Dark Theme Colors */
     --white: #ffffff;
     --off-white: #f5f3ff;
@@ -28,18 +28,18 @@
     --black: #0a0811;
     --dark-bg: #0f0b1a;
     --dark-surface: #1a1625;
-    
+
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #a78bfa 0%, #e879f9 100%);
     --gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #c4b5fd 100%);
     --gradient-hero: linear-gradient(180deg, rgba(167, 139, 250, 0.15) 0%, rgba(15, 11, 26, 0) 100%);
     --gradient-card: linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(232, 121, 249, 0.1) 100%);
     --gradient-dark-bg: linear-gradient(135deg, #0f0b1a 0%, #1a1625 50%, #231d30 100%);
-    
+
     /* Typography */
     --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    
+
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
@@ -48,26 +48,26 @@
     --spacing-xl: 3rem;
     --spacing-2xl: 4rem;
     --spacing-3xl: 6rem;
-    
+
     /* Border Radius */
     --radius-sm: 0.5rem;
     --radius-md: 0.75rem;
     --radius-lg: 1rem;
     --radius-xl: 1.5rem;
     --radius-full: 9999px;
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
     --shadow-purple: 0 10px 40px -10px rgba(124, 58, 237, 0.3);
-    
+
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-base: 250ms ease;
     --transition-slow: 350ms ease;
-    
+
     /* Container Max Width */
     --container-max: 1280px;
     --container-padding: 2rem;
@@ -102,7 +102,12 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--font-display);
     font-weight: 700;
     line-height: 1.2;
@@ -322,21 +327,21 @@ img {
    HERO SECTION
    ========================================== */
 .hero {
-/* 1. Force the section to take at least 100% of the screen height */
+    /* 1. Force the section to take at least 100% of the screen height */
     min-height: 100vh;
-    
+
     /* 2. Use Flexbox to center the content vertically within that full height */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    
+
     /* 3. Adjust padding: 
        - Top: 80px (to account for the fixed header) 
        - Side: variable 
        - Bottom: 0 (since content is centered) 
     */
     padding: 80px var(--container-padding) 0;
-    
+
     /* Keep your existing visual styles */
     background: var(--dark-bg);
     position: relative;
@@ -357,10 +362,13 @@ img {
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0.5;
         transform: scale(1);
     }
+
     50% {
         opacity: 0.8;
         transform: scale(1.05);
@@ -537,9 +545,12 @@ img {
 }
 
 @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0);
     }
+
     50% {
         transform: translateY(-10px);
     }
@@ -672,7 +683,8 @@ img {
 .flip-card {
     perspective: 1000px;
     height: 100%;
-    min-height: 500px; /* Ensures consistent height for all cards */
+    min-height: 500px;
+    /* Ensures consistent height for all cards */
 }
 
 .flip-card-inner {
@@ -912,7 +924,8 @@ img {
 
 .video-wrapper {
     position: relative;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    padding-bottom: 56.25%;
+    /* 16:9 aspect ratio */
     height: 0;
     overflow: hidden;
     border-radius: var(--radius-xl);
@@ -1200,7 +1213,8 @@ img {
 .select-icon {
     position: absolute;
     right: 1rem;
-    top: 2.5rem; /* Adjust based on label height + padding */
+    top: 2.5rem;
+    /* Adjust based on label height + padding */
     pointer-events: none;
     color: var(--gray-500);
 }
@@ -1233,7 +1247,7 @@ img {
     .form-wrapper {
         padding: 1.5rem;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
         gap: 1.5rem;
@@ -1364,39 +1378,39 @@ img {
     :root {
         --container-padding: 1.5rem;
     }
-    
+
     .nav-links {
         gap: 1.5rem;
     }
-    
+
     .hero-content {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
-    
+
     .hero-title {
         font-size: 2.75rem;
     }
-    
+
     .hero-visual {
         height: 400px;
     }
-    
+
     .problem-grid,
     .features-grid,
     .feedback-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .flip-card {
         min-height: 450px;
     }
-    
+
     .about-layout {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
-    
+
     .footer-main {
         grid-template-columns: 1fr;
         gap: 3rem;
@@ -1410,8 +1424,8 @@ img {
     }
 
     /* Hide login/signup buttons on mobile, keep user menu */
-    .nav-actions > .btn-link,
-    .nav-actions > .btn-primary {
+    .nav-actions>.btn-link,
+    .nav-actions>.btn-primary {
         display: none;
     }
 
@@ -1420,76 +1434,72 @@ img {
         display: block !important;
     }
 
+
+    /* User menu mobile adjustments */
     .user-menu-trigger {
         padding: 0.5rem;
-        gap: 0;
     }
 
-    .user-menu-trigger .user-name,
-    .user-menu-trigger svg.chevron-icon {
-        display: none;
-    }
-
-    .user-menu-trigger svg.user-icon {
-        display: block;
+    .user-menu-trigger .user-name {
+        max-width: 80px;
+        font-size: 0.85rem;
     }
 
     .user-dropdown {
-        right: 0;
-        min-width: 160px;
+        min-width: 180px;
     }
 
     .mobile-menu-toggle {
         display: flex;
     }
-    
+
     .hero {
         padding: 8rem var(--container-padding) 4rem;
     }
-    
+
     .hero-title {
         font-size: 2.25rem;
     }
-    
+
     .hero-description {
         font-size: 1.125rem;
     }
-    
+
     .hero-actions {
         flex-direction: column;
     }
-    
+
     .hero-stats {
         flex-direction: column;
         align-items: flex-start;
         gap: 1.5rem;
     }
-    
+
     .stat-divider {
         display: none;
     }
-    
+
     .section-title {
         font-size: 2rem;
     }
-    
+
     .flip-card {
         min-height: 400px;
     }
-    
+
     .cta-title {
         font-size: 2rem;
     }
-    
+
     .cta-actions {
         flex-direction: column;
     }
-    
+
     .footer-links {
         grid-template-columns: 1fr;
         gap: 2rem;
     }
-    
+
     .footer-bottom {
         flex-direction: column;
         gap: 1.5rem;
@@ -1502,11 +1512,11 @@ img {
     .hero-title {
         font-size: 1.875rem;
     }
-    
+
     .section-title {
         font-size: 1.75rem;
     }
-    
+
     .btn-hero-primary,
     .btn-hero-secondary,
     .btn-cta-primary,
@@ -1514,7 +1524,7 @@ img {
         width: 100%;
         justify-content: center;
     }
-    
+
     .flip-card {
         min-height: 380px;
     }
@@ -1533,6 +1543,7 @@ button:focus {
 
 /* Reduced motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -1672,6 +1683,7 @@ button:focus {
 
 /* Print styles */
 @media print {
+
     .header,
     .footer,
     .cta-section {
@@ -1706,7 +1718,8 @@ button:focus {
 
 /* 3. The Dropdown Menu (Hidden by default) */
 #userDropdown {
-    display: none; /* JS will toggle this via the parent class */
+    display: none;
+    /* JS will toggle this via the parent class */
     position: absolute;
     right: 0;
     top: 100%;
@@ -1779,30 +1792,31 @@ button:focus {
 }
 
 /* Size the trigger icons */
-.user-icon, .chevron-icon {
+.user-icon,
+.chevron-icon {
     width: 18px;
     height: 18px;
 }
 
 /* Style the dropdown menu box */
-#userDropdown { 
-    display: none; 
-    position: absolute; 
-    right: 0; 
+#userDropdown {
+    display: none;
+    position: absolute;
+    right: 0;
     top: 100%;
     margin-top: 10px;
-    background: #1a1a2e; 
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     z-index: 10000;
     min-width: 180px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     padding: 8px 0;
 }
 
 /* Show the menu when parent is active */
-#userMenu.active #userDropdown { 
-    display: block !important; 
+#userMenu.active #userDropdown {
+    display: block !important;
 }
 
 /* Align items inside the dropdown */
@@ -1817,5 +1831,5 @@ button:focus {
 }
 
 .dropdown-item:hover {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
 }

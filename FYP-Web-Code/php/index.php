@@ -757,6 +757,23 @@ $userRole = $_SESSION['role'] ?? 'user';
         </footer>
 
         <script src="../../JavaScript/script.js"></script>
+
+        <!-- Typebot.io Chatbot Bubble -->
+        <script>
+            const typebotInitScript = document.createElement("script");
+            typebotInitScript.type = "module";
+            typebotInitScript.innerHTML = `import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
+
+Typebot.initBubble({
+  typebot: "faq-amk0u8y",
+  theme: {
+    button: { backgroundColor: "#1D1D1D" },
+    chatWindow: { backgroundColor: "#F8F8F8" },
+  },
+});
+`;
+            document.body.append(typebotInitScript);
+        </script>
 </body>
 
 </html>

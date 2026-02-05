@@ -398,6 +398,24 @@ function smoothScrollTo(targetId) {
    ADDITIONAL UTILITY FUNCTIONS
    ========================================== */
 
+// ==========================================
+// TYPEBOT.IO CHATBOT BUBBLE
+// ==========================================
+const typebotInitScript = document.createElement("script");
+typebotInitScript.type = "module";
+typebotInitScript.innerHTML = `import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
+
+Typebot.initBubble({
+  typebot: "faq-amk0u8y",
+  theme: {
+    button: { backgroundColor: "#1D1D1D" },
+    chatWindow: { backgroundColor: "#F8F8F8" },
+  },
+});
+`;
+document.body.append(typebotInitScript);
+
+
 function setButtonLoading(buttonSelector, isLoading) {
     const btn = document.querySelector(buttonSelector);
     if (!btn) return;

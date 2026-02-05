@@ -23,7 +23,7 @@
     border-right: 1px solid rgba(167, 139, 250, 0.2);
     display: flex;
     flex-direction: column;
-    z-index: 1000;
+    z-index: 2000;
     transition: transform 0.3s ease, width 0.3s ease;
 }
 
@@ -185,7 +185,7 @@
 .dashboard-header {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
     background: rgba(15, 11, 26, 0.95);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(167, 139, 250, 0.2);
@@ -362,6 +362,15 @@
     margin-bottom: 2rem;
 }
 
+/* Calendar Grid - UPDATED */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: auto; /* Ensures rows expand to show dates */
+    gap: 0.5rem;
+    min-height: 300px; /* Fallback to prevent the card from collapsing */
+}
+
 .calendar-nav-btn {
     width: 40px;
     height: 40px;
@@ -389,13 +398,6 @@
     font-weight: 700;
     color: var(--gray-900);
     font-family: var(--font-display);
-}
-
-/* Calendar Grid */
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
 }
 
 .calendar-day-header {
@@ -1127,4 +1129,74 @@
     .modal-form {
         padding: 1.5rem;
     }
+}
+
+/* Notification Animations */
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOutRight {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100px); }
+}
+
+.calendar-day.google-event::after { background: #8b5cf6; } /* Purple dot */
+.calendar-day.local-event::after { background: #10b981; }  /* Green dot */
+
+/* Color the dots based on event source */
+.calendar-day.google-event::after {
+    background: #a78bfa; /* Purple for Google */
+}
+
+.calendar-day.local-event::after {
+    background: #10b981; /* Green for Local */
+}
+
+/* Ensure the dots are visible on the dark background */
+.calendar-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   CALENDAR DOTS (Google vs Local)
+   ========================================== */
+.calendar-day.google-event::after {
+    content: '';
+    position: absolute;
+    bottom: 4px; left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #a78bfa; /* Purple for Google */
+    box-shadow: 0 0 5px rgba(167, 139, 250, 0.5);
+}
+
+.calendar-day.local-event::after {
+    content: '';
+    position: absolute;
+    bottom: 4px; left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #10b981; /* Green for Local */
+}
+
+.calendar-day.has-event::after {
+    /* Base style for any dot */
+    content: '';
+    position: absolute;
+    bottom: 4px; left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
 }

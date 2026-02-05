@@ -361,6 +361,6 @@ $progress_percentage = round(($user_points / $next_level_points) * 100);
         </div>
     </div>
     
-    <script src="/FYP-Web-Code/FYP-Web-Code/JavaScript/dashboard.js"></script>
+    <script src="../../JavaScript/dashboard.js"></script>
 </body>
 </html>

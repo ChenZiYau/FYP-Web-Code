@@ -321,7 +321,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
         
     </main>
     
-    <div class="modal" id="createModal">
+   <div class="modal" id="createModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Create New</h2>
@@ -352,22 +352,33 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                 <div class="form-row">
                     <div class="form-group">
                         <label for="itemDate">Date</label>
-                        <input type="date" id="itemDate" name="date">
+                        <input type="date" id="itemDate" name="date" required 
+                            min="2024-01-01" max="2030-12-31"
+                            onblur="if(this.value > '2030-12-31') this.value = '2030-12-31';">
                     </div>
                     
                     <div class="form-group">
-                        <label for="itemPriority">Priority</label>
-                        <select id="itemPriority" name="priority">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                        </select>
+                        <div class="priority-header">
+                            <label>Priority</label>
+                            <span id="priorityText" class="priority-display priority-medium">Medium</span>
+                        </div>
+                        
+                        <div class="slider-container">
+                            <input type="range" id="prioritySlider" min="1" max="3" step="1" value="2" class="priority-range">
+                            <input type="hidden" name="priority" id="realPriorityInput" value="medium">
+                        </div>
+                        
+                        <div class="slider-labels">
+                            <span>Low</span>
+                            <span>Medium</span>
+                            <span>High</span>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn-primary">Create</button>
+                    <button type="submit" class="btn-primary">Create Task</button>
                 </div>
             </form>
         </div>

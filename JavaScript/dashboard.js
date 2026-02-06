@@ -20,6 +20,50 @@ document.addEventListener('DOMContentLoaded', function() {
     if (closeModal) closeModal.addEventListener('click', () => modal.classList.remove('active'));
     if (cancelBtn) cancelBtn.addEventListener('click', () => modal.classList.remove('active'));
 
+// --- PRIORITY SLIDER LOGIC ---
+    const prioritySlider = document.getElementById('prioritySlider');
+    const priorityText = document.getElementById('priorityText');
+    const realPriorityInput = document.getElementById('realPriorityInput');
+
+    if (prioritySlider) {
+        const priorityMap = {
+            '1': { label: 'Low',    color: '#10b981', textClass: 'priority-low',    cssClass: 'low' },
+            '2': { label: 'Medium', color: '#f59e0b', textClass: 'priority-medium', cssClass: 'medium' },
+            '3': { label: 'High',   color: '#ef4444', textClass: 'priority-high',   cssClass: 'high' }
+        };
+
+        function updatePriority(value) {
+            const priority = priorityMap[value];
+            if (!priority) return;
+
+            // 1. Update Text
+            if (priorityText) {
+                priorityText.textContent = priority.label;
+                priorityText.className = `priority-display ${priority.textClass}`;
+            }
+
+            // 2. Update Hidden Input
+            if (realPriorityInput) {
+                realPriorityInput.value = priority.label.toLowerCase();
+            }
+
+            // 3. Update Slider Classes (for thumb color)
+            prioritySlider.className = `priority-range ${priority.cssClass}`;
+
+            // 4. Update Slider Background Gradient (The Fill Effect)
+            // 1=0%, 2=50%, 3=100%
+            const percentage = ((Number(value) - 1) / 2) * 100;
+            
+            // Paint: Color on the left, Dark Gray on the right
+            prioritySlider.style.background = `linear-gradient(to right, ${priority.color} 0%, ${priority.color} ${percentage}%, #374151 ${percentage}%, #374151 100%)`;
+        }
+
+        // Event Listeners
+        prioritySlider.addEventListener('input', function() { updatePriority(this.value); });
+        
+        // Initialize
+        updatePriority(prioritySlider.value);
+    }
     // --- 3. CREATE TASK FORM HANDLING ---
     const createForm = document.getElementById('createForm');
     if (createForm) {
@@ -36,6 +80,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(data.status === 'success') {
                     modal.classList.remove('active');
                     createForm.reset();
+                    // Reset slider back to medium after form reset
+                    if (prioritySlider) {
+                        prioritySlider.value = 2;
+                        const priorityText = document.getElementById('priorityText');
+                        const realPriorityInput = document.getElementById('realPriorityInput');
+                        if (priorityText) {
+                            priorityText.textContent = 'Medium';
+                            priorityText.classList.remove('priority-low', 'priority-high');
+                            priorityText.classList.add('priority-medium');
+                        }
+                        if (realPriorityInput) realPriorityInput.value = 'medium';
+                        prioritySlider.classList.remove('low', 'high');
+                        prioritySlider.classList.add('medium');
+                    }
                     window.location.reload();
                 } else {
                     alert('Error saving task: ' + (data.message || 'Unknown error'));
@@ -65,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const timeMax = new Date(currentYear, currentMonth + 1, 0).toISOString();
             const googleUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true`;
             
-            // FIX 4: Removed 'php/' prefix
             const localUrl = `get_events.php?month=${currentMonth + 1}&year=${currentYear}`;
 
             try {
@@ -147,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // --- 5. COMPLETE TASK LOGIC (Global) ---
 window.completeTask = function(taskId) {
-    // FIX 5: Removed 'php/' prefix
     fetch('update_task.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

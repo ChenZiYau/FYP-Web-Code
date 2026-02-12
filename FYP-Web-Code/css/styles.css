@@ -527,21 +527,31 @@ img {
 }
 
 .card-1 {
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
+    top: 3%;
+    left: 15%;
+    width: 300px;
+    animation-delay: 1s;
 }
 
 .card-2 {
-    top: 44%;
-    right: 10%;
+    top: 27%;
+    left: 40%;
+    width: 300px;
     animation-delay: 0.5s;
 }
 
 .card-3 {
-    bottom: 10%;
-    left: 20%;
+    top: 51%;
+    left: 15%;
+    width: 300px;
     animation-delay: 1s;
+}
+
+.card-4 {
+    top: 75%;
+    left: 40%;
+    width: 300px;
+    animation-delay: 1.5s;
 }
 
 @keyframes float {

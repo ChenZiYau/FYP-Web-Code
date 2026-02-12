@@ -181,8 +181,7 @@ $userRole = $_SESSION['role'] ?? 'user';
                         <span class="gradient-text">Everything Organized.</span>
                     </h1>
                     <p class="hero-description">
-                        Stop switching between apps. OptiPlan unifies your schedule, studies, and budget
-                        into one intelligent platform designed for students and young professionals.
+                        Stop switching between different applications. Optiplan unifies your schedule, studies and budgeting into one singular intelligent platform, designed speifically for students and young interns.
                     </p>
                     <div class="hero-actions">
                         <?php if ($isLoggedIn): ?>
@@ -223,8 +222,8 @@ $userRole = $_SESSION['role'] ?? 'user';
                         <div class="preview-card card-2">
                             <div class="card-icon">📚</div>
                             <div class="card-content">
-                                <h3>Study Support</h3>
-                                <p>Personalized learning</p>
+                                <h3>Study Notes</h3>
+                                <p>Personalized flip cards</p>
                             </div>
                         </div>
                         <div class="preview-card card-3">
@@ -232,6 +231,13 @@ $userRole = $_SESSION['role'] ?? 'user';
                             <div class="card-content">
                                 <h3>Budget Tracking</h3>
                                 <p>Financial awareness</p>
+                            </div>
+                        </div>
+                        <div class="preview-card card-4">
+                            <div class="card-icon">🔜</div>
+                            <div class="card-content">
+                                <h3>Many More</h3>
+                                <p>More updates to come...</p>
                             </div>
                         </div>
                     </div>
@@ -246,13 +252,11 @@ $userRole = $_SESSION['role'] ?? 'user';
                     <span class="section-label">About the Creator</span>
                     <h2 class="section-title">Built by a Student, For Students</h2>
                     <p class="about-me-text">
-                        Hi! I'm a student who experienced firsthand the frustration of juggling multiple apps
-                        for scheduling, studying, and budgeting. After missing too many deadlines and feeling
-                        overwhelmed by app-switching, I decided to build the solution I wished existed.
+                        Hi! I am a student who had experienced firsthand the frustration of juggling multiple apps just to organize scheduling, studying and budeeting. 
+                        After almost missing too many assignments and project deadlines, I realized I needed a better solution. That's when OptiPlan was born.
                     </p>
                     <p class="about-me-text">
-                        OptiPlan is my final year project and a passion project aimed at making student life
-                        more manageable. I hope it helps you as much as it's helped me.
+                        OptiPlan is my final year project and a passion project aimed at making student's life more manageable. I hope it helps you as much as it's helpde me.
                     </p>
                 </div>
             </div>
@@ -274,13 +278,12 @@ $userRole = $_SESSION['role'] ?? 'user';
                         <span class="section-label">About OptiPlan</span>
                         <h2 class="section-title">Built for Students Who Want More</h2>
                         <p class="about-text">
-                            OptiPlan was created to solve a universal problem: the chaos of managing multiple apps
-                            for different aspects of student life. We believe productivity shouldn't be complicated.
+                            Managing student life shouldn't require a dozen different tools. 
+                            OptiPlan unifies the essential pillars of your day—scheduling, study management, and financial health—into one streamlined interface.
                         </p>
                         <p class="about-text">
-                            Our AI-powered platform learns from your behavior, adapts to your schedule, and helps
-                            you make smarter decisions about your time and money. Whether you're juggling assignments,
-                            part-time work, or extracurriculars, OptiPlan keeps everything in sync.
+                            Our technology is designed to be unobtrusive yet impactful, adapting to the nuances of your schedule to provide actionable insights. 
+                            From deadline management to budget tracking, OptiPlan ensures your most important data is always in sync, allowing you to focus on what truly matters.
                         </p>
                         <div class="about-features">
                             <div class="about-feature-item">
@@ -406,7 +409,7 @@ $userRole = $_SESSION['role'] ?? 'user';
                                             stroke-linecap="round" />
                                     </svg>
                                 </div>
-                                <h3 class="feature-title">Study Support</h3>
+                                <h3 class="feature-title">Study Notes</h3>
                                 <p class="feature-description">Personalized study plans, progress tracking, and
                                     AI-powered insights to improve your academic performance.</p>
                                 <ul class="feature-list">

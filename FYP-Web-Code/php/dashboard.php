@@ -16,11 +16,13 @@ $user_points = 0;
 $current_streak = 0;
 
 // 2. Fetch User Data & Handle Streak
+
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($user) {
+
     $last_login = $user['last_login'] ?? null;
     $current_streak = $user['streak_count'] ?? 0;
     $user_level = $user['level'] ?? 1; 
@@ -29,14 +31,15 @@ if ($user) {
     // Check Streak Logic
     if ($last_login !== $today) {
         $yesterday = date('Y-m-d', strtotime('-1 day'));
-        
+
         if ($last_login == $yesterday) {
             $new_streak = $current_streak + 1; 
         } else {
             $new_streak = 1; 
         }
-        
+
         // Update user record
+
         $update = $pdo->prepare("UPDATE users SET last_login = ?, streak_count = ? WHERE id = ?");
         $update->execute([$today, $new_streak, $user_id]);
         $current_streak = $new_streak;
@@ -69,16 +72,12 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - OptiPlan</title>
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 3b99ad921baa57cf97543c34f477660c70bc786d
     <link rel="stylesheet" href="../css/dashboard.css">
     
 </head>
 <body class="dashboard-body">
-    
+
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="index.php" class="sidebar-logo">
@@ -93,7 +92,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                 </svg>
             </div>
         </div>
-        
+
         <nav class="sidebar-nav">
             <button class="nav-item create-btn" id="createBtn">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +143,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                 <span class="nav-text">ChatBot</span>
             </a>
         </nav>
-        
+
         <div class="sidebar-footer">
             <a href="logout.php" class="nav-item logout-btn">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,9 +153,9 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
             </a>
         </div>
     </aside>
-    
+
     <main class="main-content">
-        
+
         <header class="dashboard-header">
             <div class="header-left">
                 <button class="mobile-menu-toggle" id="mobileSidebarToggle">
@@ -168,7 +167,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                     <h1 class="welcome-text">Welcome, <span class="user-name"><?php echo htmlspecialchars($user_name); ?></span> !</h1>
                 </div>
             </div>
-            
+
             <div class="header-right">
                 <div class="level-badge">
                     <span class="level-text">Lvl</span>
@@ -177,19 +176,20 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                         <div class="notification-dot"></div>
                     </div>
                 </div>
-                
+
                 <button class="settings-btn" id="settingsBtn">
                     <svg class="settings-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <span class="settings-text">Settings</span>
+
                 </button>
             </div>
         </header>
-        
+
         <div class="dashboard-grid">
-            
+
             <section class="calendar-section">
                 <div class="calendar-card">
                     <div class="calendar-header">
@@ -205,12 +205,12 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                             </svg>
                         </button>
                     </div>
-                    
+
                     <div class="calendar-grid" id="calendarGrid">
                         </div>
                 </div>
             </section>
-            
+
             <section class="stats-section">
                 <div class="stat-card">
                     <div class="stat-icon tasks-icon">
@@ -223,7 +223,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                         <div class="stat-label">Active Tasks</div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-icon schedule-icon">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +235,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                         <div class="stat-label">Today's Events</div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-icon streak-icon">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,13 +249,13 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                     </div>
                 </div>
             </section>
-            
+
             <section class="upcoming-section">
                 <div class="section-header">
                     <h2 class="section-title">Upcoming Tasks</h2>
                     <a href="#tasks" class="view-all-link">View All →</a>
                 </div>
-                
+
                 <div class="tasks-list">
                     <?php if (empty($upcoming_tasks)): ?>
                         <div style="padding:1rem; color:#888; text-align:center;">No upcoming tasks found. Create one!</div>
@@ -279,8 +279,12 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                     <?php endif; ?>
                 </div>
             </section>
-            
+
             <section class="progress-section">
+
+
+
+
                 <div class="progress-card">
                     <div class="progress-header">
                         <span class="progress-label">Level Progress</span>
@@ -294,7 +298,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                         <span class="progress-target"><?php echo $next_level_points; ?> XP to Level <?php echo $user_level + 1; ?></span>
                     </div>
                 </div>
-                
+
                 <div class="achievements-preview">
                     <h3 class="section-title" style="font-size: 1rem; margin-bottom: 0.5rem;">Recent Achievements</h3>
                     <div class="achievements-list">
@@ -313,11 +317,11 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                     </div>
                 </div>
             </section>
-            
+
         </div>
-        
+
     </main>
-    
+
     <div class="modal" id="createModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -328,24 +332,24 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                     </svg>
                 </div>
             </div>
-            
+
             <div class="modal-tabs">
                 <button class="modal-tab active" data-tab="task">Task</button>
                 <button class="modal-tab" data-tab="event">Event</button>
                 <button class="modal-tab" data-tab="note">Note</button>
             </div>
-            
+
             <form class="modal-form" id="createForm">
                 <div class="form-group">
                     <label for="itemTitle">Title</label>
                     <input type="text" id="itemTitle" name="title" placeholder="Enter title..." required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="itemDescription">Description</label>
                     <textarea id="itemDescription" name="description" placeholder="Add details..." rows="3"></textarea>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="itemDate">Date</label>
@@ -353,18 +357,18 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                             min="2024-01-01" max="2030-12-31"
                             onblur="if(this.value > '2030-12-31') this.value = '2030-12-31';">
                     </div>
-                    
+
                     <div class="form-group">
                         <div class="priority-header">
                             <label>Priority</label>
                             <span id="priorityText" class="priority-display priority-medium">Medium</span>
                         </div>
-                        
+
                         <div class="slider-container">
                             <input type="range" id="prioritySlider" min="1" max="3" step="1" value="2" class="priority-range">
                             <input type="hidden" name="priority" id="realPriorityInput" value="medium">
                         </div>
-                        
+
                         <div class="slider-labels">
                             <span>Low</span>
                             <span>Medium</span>
@@ -372,7 +376,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
                     <button type="submit" class="create-btn" style="border:none; padding: 0.5rem 1rem; border-radius: 0.5rem;">Create Task</button>
@@ -380,7 +384,6 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
             </form>
         </div>
     </div>
-    
+
     <script src="../../JavaScript/dashboard.js"></script>
 </body>
-</html>

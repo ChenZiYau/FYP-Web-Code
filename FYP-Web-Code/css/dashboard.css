@@ -1,7 +1,5 @@
 /* ==========================================
    1. VARIABLES & SETUP (Copied from styles.css)
-<<<<<<< HEAD
-=======
    ========================================== */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -464,481 +462,26 @@ body {
 
 /* ==========================================
    8. PRIORITY SLIDER STYLES (FINAL FIX)
->>>>>>> 3b99ad921baa57cf97543c34f477660c70bc786d
    ========================================== */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
-<<<<<<< HEAD
-:root {
-    /* Dark Purple Gradient Color Palette */
-    --primary-purple: #a78bfa;
-    --primary-purple-dark: #8b5cf6;
-    --primary-purple-light: #c4b5fd;
-    --secondary-purple: #7c3aed;
-    --accent-purple: #e9d5ff;
-    --deep-purple: #6d28d9;
-    --bright-purple: #d8b4fe;
-    --neon-purple: #e879f9;
-
-    /* Dark Theme Colors */
-    --white: #ffffff;
-    --off-white: #f5f3ff;
-    --gray-50: #1a1625;
-    --gray-100: #231d30;
-    --gray-200: #2d2640;
-    --gray-300: #3d3355;
-    --gray-400: #9489b8;
-    --gray-500: #b4a7d6;
-    --gray-600: #d1c7e8;
-    --gray-700: #e5dff7;
-    --gray-800: #f3f0ff;
-    --gray-900: #faf8ff;
-    --black: #0a0811;
-    --dark-bg: #0f0b1a;
-    --dark-surface: #1a1625;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #a78bfa 0%, #e879f9 100%);
-    --gradient-card: linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(232, 121, 249, 0.1) 100%);
-    
-    /* Spacing & UI */
-    --radius-sm: 0.5rem;
-    --radius-md: 0.75rem;
-    --radius-lg: 1rem;
-    --radius-xl: 1.5rem;
-    --radius-full: 9999px;
-    --shadow-purple: 0 10px 40px -10px rgba(124, 58, 237, 0.3);
-    
-    /* Fonts */
-    --font-display: 'Outfit', sans-serif;
-    --font-body: 'Inter', sans-serif;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-    font-family: var(--font-body);
-    background-color: var(--dark-bg);
-    color: var(--gray-700);
-    line-height: 1.6;
-}
-
-/* ==========================================
-   2. DASHBOARD LAYOUT & SIDEBAR
-   ========================================== */
-.dashboard-body {
+/* Header & Text */
+.priority-header {
     display: flex;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-/* Sidebar Container */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 260px;
-    height: 100vh;
-    background: var(--dark-surface);
-    border-right: 1px solid rgba(167, 139, 250, 0.2);
-    display: flex;
-    flex-direction: column;
-    z-index: 50;
-    transition: transform 0.3s ease;
-}
-
-.sidebar-header {
-    height: 80px;
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 0 1.5rem;
-    border-bottom: 1px solid rgba(167, 139, 250, 0.1);
+    align-items: center;
+    margin-bottom: 0.75rem;
 }
 
-.sidebar-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-family: var(--font-display);
+.priority-display {
+    font-size: 0.875rem;
     font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--white);
-    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: color 0.3s ease;
 }
 
-.sidebar-logo .logo-icon {
-    width: 32px;
-    height: 32px;
-    color: var(--primary-purple);
-}
-
-.sidebar-toggle {
-    color: var(--gray-500);
-    padding: 0.5rem;
-    cursor: pointer;
-}
-
-/* Sidebar Navigation */
-.sidebar-nav {
-    flex: 1;
-    padding: 1.5rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    overflow-y: auto;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    color: var(--gray-500);
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-    font-weight: 500;
-    text-decoration: none;
-}
-
-.nav-item:hover, .nav-item.active {
-    background: rgba(167, 139, 250, 0.1);
-    color: var(--white);
-}
-
-.nav-item.active {
-    border-left: 3px solid var(--primary-purple);
-}
-
-.nav-icon {
-    width: 20px; 
-    height: 20px;
-    flex-shrink: 0;
-}
-
-.create-btn {
-    background: var(--gradient-primary);
-    color: var(--white) !important;
-    justify-content: center;
-    box-shadow: var(--shadow-purple);
-    margin-bottom: 1.5rem;
-    cursor: pointer;
-}
-
-.create-btn:hover {
-    transform: translateY(-2px);
-}
-
-.sidebar-footer {
-    padding: 1.5rem;
-    border-top: 1px solid rgba(167, 139, 250, 0.1);
-}
-
-/* ==========================================
-   3. MAIN CONTENT AREA
-   ========================================== */
-.main-content {
-    flex: 1;
-    margin-left: 260px;
-    padding: 2rem;
-    width: 100%;
-}
-
-/* Header */
-.dashboard-header {
-=======
-/* Header & Text */
-.priority-header {
->>>>>>> 3b99ad921baa57cf97543c34f477660c70bc786d
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.mobile-menu-toggle {
-    display: none;
-    color: var(--white);
-    background: none;
-    border: none;
-}
-.mobile-menu-toggle svg { width: 24px; height: 24px; }
-
-.welcome-text { font-size: 1.5rem; color: var(--white); font-family: var(--font-display); }
-.user-name { color: var(--primary-purple); }
-
-.header-right { display: flex; align-items: center; gap: 1.5rem; }
-
-/* Level Badge */
-.level-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(167, 139, 250, 0.1);
-    padding: 0.25rem 0.5rem 0.25rem 1rem;
-    border-radius: var(--radius-full);
-    border: 1px solid rgba(167, 139, 250, 0.2);
-}
-.level-text { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--primary-purple); }
-.level-circle {
-    width: 32px; height: 32px;
-    background: var(--dark-surface);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; color: var(--white);
-    position: relative;
-}
-
-/* Settings Button */
-.settings-btn {
-    position: relative;
-    color: var(--gray-400);
-    display: flex; align-items: center; gap: 0.5rem;
-    background: none; border: none; cursor: pointer;
-}
-.settings-btn:hover { color: var(--white); }
-.settings-icon { width: 24px; height: 24px; }
-.settings-text { display: none; }
-.notification-dot {
-    position: absolute; top: 0; right: 0;
-    width: 8px; height: 8px;
-    background: #ef4444; border-radius: 50%;
-    border: 1px solid var(--dark-bg);
-}
-
-/* ==========================================
-   4. DASHBOARD GRID & STATS
-   ========================================== */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 1.5rem;
-}
-
-/* Stats Cards */
-.stats-section {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.stat-card {
-    background: var(--dark-surface);
-    border: 1px solid rgba(167, 139, 250, 0.1);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
-    display: flex; align-items: center; gap: 1rem;
-    transition: transform 0.2s;
-}
-.stat-card:hover { transform: translateY(-2px); border-color: var(--primary-purple); }
-
-.stat-icon {
-    width: 48px; height: 48px;
-    border-radius: var(--radius-md);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-}
-.stat-icon svg { width: 24px; height: 24px; }
-
-.tasks-icon { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
-.schedule-icon { background: rgba(16, 185, 129, 0.1); color: #34d399; }
-.streak-icon { background: rgba(245, 158, 11, 0.1); color: #fbbf24; }
-
-.stat-value { font-size: 1.5rem; font-weight: 700; color: var(--white); line-height: 1; margin-bottom: 0.25rem; }
-.stat-label { font-size: 0.875rem; color: var(--gray-500); }
-
-/* ==========================================
-   5. CALENDAR SECTION
-   ========================================== */
-.calendar-section {
-    grid-column: 1;
-    background: var(--dark-surface);
-    border-radius: var(--radius-xl);
-    padding: 1.5rem;
-    border: 1px solid rgba(167, 139, 250, 0.1);
-}
-
-.calendar-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 1.5rem; 
-}
-
-.calendar-month { 
-    font-size: 1.125rem; 
-    color: var(--white); 
-    font-family: var(--font-display); 
-}
-
-.calendar-nav-btn { 
-    color: var(--gray-400); 
-    padding: 0.25rem; 
-    cursor: pointer;
-    background: none;  /* Removes the white background */
-    border: none;      /* Removes the gray border */
-    display: flex;     /* Centers the icon */
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-}
-
-.calendar-nav-btn:hover { 
-    color: var(--white); 
-    background: rgba(255, 255, 255, 0.05); /* Optional: subtle hover effect */
-    border-radius: 4px;
-}
-
-.calendar-nav-btn svg { 
-    width: 20px; 
-    height: 20px; 
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
-    text-align: center;
-}
-
-.calendar-day-header { font-size: 0.75rem; color: var(--gray-500); margin-bottom: 0.5rem; }
-.calendar-day {
-    aspect-ratio: 1;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.875rem; color: var(--gray-400);
-    border-radius: var(--radius-sm);
-    cursor: pointer; position: relative;
-}
-.calendar-day:hover { background: rgba(255, 255, 255, 0.05); }
-.calendar-day.today { background: var(--primary-purple); color: var(--white); font-weight: 700; }
-.calendar-day.other-month { opacity: 0.3; }
-.calendar-day.has-event::after {
-    content: ''; position: absolute; bottom: 4px;
-    width: 4px; height: 4px; border-radius: 50%;
-    background: #fbbf24;
-}
-
-/* ==========================================
-   6. TASKS & PROGRESS
-   ========================================== */
-.upcoming-section {
-    grid-column: 1;
-    background: var(--dark-surface);
-    border-radius: var(--radius-xl);
-    padding: 1.5rem;
-    border: 1px solid rgba(167, 139, 250, 0.1);
-}
-
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-.section-title { font-size: 1.25rem; color: var(--white); margin: 0; }
-.view-all-link { font-size: 0.875rem; color: var(--primary-purple); text-decoration: none; }
-
-.task-item {
-    display: flex; align-items: center; gap: 1rem;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: var(--radius-md);
-    margin-bottom: 0.5rem;
-    border-left: 3px solid transparent;
-}
-.task-item.priority-high { border-left-color: #ef4444; }
-.task-item.priority-medium { border-left-color: #f59e0b; }
-.task-item.priority-low { border-left-color: #10b981; }
-
-.task-checkbox input { display: none; }
-.task-checkbox label {
-    width: 20px; height: 20px;
-    border: 2px solid var(--gray-500);
-    border-radius: 4px; display: block; cursor: pointer;
-}
-.task-checkbox input:checked + label { background: var(--primary-purple); border-color: var(--primary-purple); }
-.task-title { font-weight: 500; color: var(--gray-200); }
-.task-meta { font-size: 0.75rem; color: var(--gray-500); display: flex; gap: 0.5rem; }
-
-/* Progress Section */
-.progress-section { grid-column: 1 / -1; }
-.progress-card {
-    background: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(232, 121, 249, 0.05) 100%);
-    padding: 1.5rem; border-radius: var(--radius-lg);
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    margin-bottom: 1.5rem;
-}
-.progress-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--white); font-weight: 600; }
-.progress-bar { height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem; }
-.progress-fill { height: 100%; background: var(--gradient-primary); border-radius: 4px; transition: width 0.5s ease; }
-.progress-footer { display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--gray-500); }
-
-.achievements-list { display: flex; gap: 1rem; flex-wrap: wrap; }
-.achievement-badge {
-    background: var(--dark-bg); padding: 0.5rem 1rem;
-    border-radius: var(--radius-full);
-    display: flex; align-items: center; gap: 0.5rem;
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    color: var(--gray-200); font-size: 0.875rem;
-}
-
-/* ==========================================
-   7. MODAL STYLES
-   ========================================== */
-.modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-    z-index: 1000;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; visibility: hidden; transition: all 0.2s;
-}
-.modal.active { opacity: 1; visibility: visible; }
-
-.modal-content {
-    background: var(--dark-surface);
-    width: 100%; max-width: 500px;
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    padding: 2rem;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
-
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.modal-title { font-size: 1.5rem; color: var(--white); }
-.modal-close { color: var(--gray-500); cursor: pointer; }
-.modal-close svg { width: 24px; height: 24px; }
-
-.modal-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: var(--dark-bg); padding: 0.25rem; border-radius: var(--radius-md); }
-.modal-tab {
-    flex: 1; padding: 0.5rem; text-align: center;
-    color: var(--gray-500); border-radius: var(--radius-sm);
-    cursor: pointer; font-size: 0.875rem;
-}
-.modal-tab.active { background: var(--dark-surface); color: var(--white); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-
-.form-group { margin-bottom: 1rem; }
-.form-group label { display: block; margin-bottom: 0.5rem; color: var(--gray-400); font-size: 0.875rem; }
-.form-group input[type="text"], 
-.form-group input[type="date"], 
-.form-group textarea {
-    width: 100%; background: var(--dark-bg);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--white); padding: 0.75rem;
-    border-radius: var(--radius-md); font-family: inherit;
-}
-.form-group input:focus, .form-group textarea:focus { border-color: var(--primary-purple); outline: none; }
-
-.modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
-.btn-secondary { color: var(--gray-400); padding: 0.5rem 1rem; cursor: pointer; }
-.btn-secondary:hover { color: var(--white); }
-
-/* ==========================================
-   8. PRIORITY SLIDER STYLES (FINAL FIX)
-   ========================================== */
-
-/* Header & Text */
-.priority-header {
-    display: flex;
-    justify-content: space-between;
-@@ -23,14 +485,14 @@
+/* Text Colors */
+.priority-low    { color: #10b981; } /* Green */
 .priority-medium { color: #f59e0b; } /* Orange */
 .priority-high   { color: #ef4444; } /* Red */
 
@@ -953,30 +496,32 @@ body {
 .priority-range {
     -webkit-appearance: none;
     appearance: none;
-@@ -39,12 +501,10 @@
+    width: 100%;
+    height: 8px;
     border-radius: 4px;
     outline: none;
     cursor: pointer;
     background: #374151; /* Default dark gray */
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 3b99ad921baa57cf97543c34f477660c70bc786d
 }
 
 /* The Thumb (The Circle) */
 .priority-range::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-@@ -59,12 +519,11 @@
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #374151;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
     margin-top: -1px; 
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 3b99ad921baa57cf97543c34f477660c70bc786d
 .priority-range::-webkit-slider-thumb:hover {
     transform: scale(1.15);
 }
@@ -985,7 +530,12 @@ body {
 .priority-range.low::-webkit-slider-thumb    { border-color: #10b981; }
 .priority-range.medium::-webkit-slider-thumb { border-color: #f59e0b; }
 .priority-range.high::-webkit-slider-thumb   { border-color: #ef4444; }
-@@ -77,4 +536,19 @@
+
+/* Labels */
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
     color: #9ca3af;
     font-weight: 500;
     padding: 0 2px;

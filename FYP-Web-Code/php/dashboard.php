@@ -72,7 +72,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - OptiPlan</title>
-    <link rel="stylesheet" href="../css/styles.css">
+
     <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body class="dashboard-body">

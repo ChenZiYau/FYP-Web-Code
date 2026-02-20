@@ -1,7 +1,7 @@
 /* ==========================================
    1. VARIABLES & SETUP (Copied from styles.css)
    ========================================== */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap');
 
 :root {
     /* Dark Purple Gradient Color Palette */
@@ -44,7 +44,7 @@
     --shadow-purple: 0 10px 40px -10px rgba(124, 58, 237, 0.3);
     
     /* Fonts */
-    --font-display: 'Outfit', sans-serif;
+    --font-display: 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
 }
 
@@ -52,9 +52,12 @@
 
 body {
     font-family: var(--font-body);
+    font-weight: 300;
+    letter-spacing: -0.01em;
     background-color: var(--dark-bg);
     color: var(--gray-700);
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* ==========================================
@@ -95,7 +98,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 400;
     font-size: 1.25rem;
     color: var(--white);
     text-decoration: none;
@@ -131,7 +134,7 @@ body {
     color: var(--gray-500);
     border-radius: var(--radius-md);
     transition: all 0.2s ease;
-    font-weight: 500;
+    font-weight: 300;
     text-decoration: none;
 }
 
@@ -209,13 +212,13 @@ body {
     border-radius: var(--radius-full);
     border: 1px solid rgba(167, 139, 250, 0.2);
 }
-.level-text { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--primary-purple); }
+.level-text { font-size: 0.75rem; font-weight: 400; text-transform: uppercase; color: var(--primary-purple); }
 .level-circle {
     width: 32px; height: 32px;
     background: var(--dark-surface);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; color: var(--white);
+    font-weight: 400; color: var(--white);
     position: relative;
 }
 
@@ -277,7 +280,7 @@ body {
 .schedule-icon { background: rgba(16, 185, 129, 0.1); color: #34d399; }
 .streak-icon { background: rgba(245, 158, 11, 0.1); color: #fbbf24; }
 
-.stat-value { font-size: 1.5rem; font-weight: 700; color: var(--white); line-height: 1; margin-bottom: 0.25rem; }
+.stat-value { font-size: 1.5rem; font-weight: 400; color: var(--white); line-height: 1; margin-bottom: 0.25rem; }
 .stat-label { font-size: 0.875rem; color: var(--gray-500); }
 
 /* ==========================================
@@ -343,7 +346,7 @@ body {
     cursor: pointer; position: relative;
 }
 .calendar-day:hover { background: rgba(255, 255, 255, 0.05); }
-.calendar-day.today { background: var(--primary-purple); color: var(--white); font-weight: 700; }
+.calendar-day.today { background: var(--primary-purple); color: var(--white); font-weight: 400; }
 .calendar-day.other-month { opacity: 0.3; }
 .calendar-day.has-event::after {
     content: ''; position: absolute; bottom: 4px;
@@ -385,7 +388,7 @@ body {
     border-radius: 4px; display: block; cursor: pointer;
 }
 .task-checkbox input:checked + label { background: var(--primary-purple); border-color: var(--primary-purple); }
-.task-title { font-weight: 500; color: var(--gray-200); }
+.task-title { font-weight: 300; color: var(--gray-200); }
 .task-meta { font-size: 0.75rem; color: var(--gray-500); display: flex; gap: 0.5rem; }
 
 /* Progress Section */
@@ -396,7 +399,7 @@ body {
     border: 1px solid rgba(167, 139, 250, 0.2);
     margin-bottom: 1.5rem;
 }
-.progress-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--white); font-weight: 600; }
+.progress-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--white); font-weight: 400; }
 .progress-bar { height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem; }
 .progress-fill { height: 100%; background: var(--gradient-primary); border-radius: 4px; transition: width 0.5s ease; }
 .progress-footer { display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--gray-500); }
@@ -442,7 +445,7 @@ body {
     color: var(--gray-500); border-radius: var(--radius-sm);
     cursor: pointer; font-size: 0.875rem;
 }
-.modal-tab.active { background: var(--dark-surface); color: var(--white); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.modal-tab.active { background: var(--dark-surface); color: var(--white); font-weight: 400; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
 .form-group { margin-bottom: 1rem; }
 .form-group label { display: block; margin-bottom: 0.5rem; color: var(--gray-400); font-size: 0.875rem; }
@@ -475,7 +478,7 @@ body {
 
 .priority-display {
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: color 0.3s ease;
@@ -538,7 +541,7 @@ body {
     justify-content: space-between;
     font-size: 0.75rem;
     color: #9ca3af;
-    font-weight: 500;
+    font-weight: 300;
     padding: 0 2px;
 }
 
@@ -626,7 +629,7 @@ body {
 
 .fq-value {
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--white);
     font-family: var(--font-display);
 }
@@ -643,7 +646,7 @@ body {
     align-items: center;
     font-size: 0.875rem;
     color: var(--gray-500);
-    font-weight: 500;
+    font-weight: 300;
 }
 
 .dash-add-btn {
@@ -653,7 +656,7 @@ body {
     padding: 0.4rem 0.875rem;
     border-radius: var(--radius-md);
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 400;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 2px 8px rgba(167, 139, 250, 0.3);
@@ -704,7 +707,7 @@ body {
 
 .dash-exp-desc {
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 300;
     color: var(--gray-700);
     text-transform: capitalize;
 }
@@ -716,7 +719,7 @@ body {
 
 .dash-exp-amount {
     font-size: 0.9375rem;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--white);
     flex-shrink: 0;
 }
@@ -764,12 +767,12 @@ body {
 .fmt-label {
     font-size: 0.8125rem;
     color: var(--gray-500);
-    font-weight: 500;
+    font-weight: 300;
 }
 
 .fmt-value {
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 400;
     font-family: var(--font-display);
     color: var(--white);
     transition: color 0.3s ease;
@@ -782,7 +785,7 @@ body {
 
 .fmt-highlight .fmt-label {
     color: var(--gray-600);
-    font-weight: 600;
+    font-weight: 400;
 }
 
 .fmt-highlight .fmt-value {

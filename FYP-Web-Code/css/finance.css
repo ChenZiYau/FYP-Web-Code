@@ -101,6 +101,100 @@
     color: #10b981;
 }
 
+/* ---- Edit icon on Budget Remaining card ---- */
+.budget-card-edit-btn {
+    position: absolute;
+    top: 0.875rem;
+    right: 0.875rem;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    background: rgba(167, 139, 250, 0.12);
+    border: 1px solid rgba(167, 139, 250, 0.25);
+    color: var(--primary-purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease, background 0.2s ease, transform 0.15s ease;
+    z-index: 2;
+}
+
+.summary-card.budget-remaining:hover .budget-card-edit-btn {
+    opacity: 1;
+}
+
+.budget-card-edit-btn:hover {
+    background: rgba(167, 139, 250, 0.28);
+    transform: scale(1.1);
+}
+
+.budget-card-edit-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ---- Inline edit UI inside the card ---- */
+.budget-inline-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.budget-inline-input {
+    width: 100%;
+    background: rgba(167, 139, 250, 0.08);
+    border: 1.5px solid var(--primary-purple);
+    border-radius: var(--radius-sm);
+    color: var(--white);
+    font-size: 1.35rem;
+    font-weight: 400;
+    font-family: var(--font-display);
+    padding: 0.3rem 0.5rem;
+    outline: none;
+}
+
+.budget-inline-input:focus {
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+}
+
+.budget-inline-actions {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.budget-inline-save,
+.budget-inline-cancel {
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.budget-inline-save {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #10b981;
+}
+
+.budget-inline-save:hover {
+    background: rgba(16, 185, 129, 0.28);
+}
+
+.budget-inline-cancel {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.budget-inline-cancel:hover {
+    background: rgba(239, 68, 68, 0.22);
+}
+
 .summary-content {
     flex: 1;
 }
@@ -108,7 +202,7 @@
 .summary-label {
     font-size: 0.875rem;
     color: var(--gray-500);
-    font-weight: 500;
+    font-weight: 300;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -116,7 +210,7 @@
 
 .summary-amount {
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--gray-900);
     font-family: var(--font-display);
     line-height: 1;
@@ -152,7 +246,7 @@
 
 .section-title {
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--gray-900);
     font-family: var(--font-display);
 }
@@ -169,7 +263,7 @@
     padding: 0.5rem 1rem;
     border-radius: var(--radius-sm);
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--gray-500);
     transition: all var(--transition-base);
 }
@@ -228,13 +322,13 @@
 .legend-label {
     font-size: 0.875rem;
     color: var(--gray-600);
-    font-weight: 500;
+    font-weight: 300;
 }
 
 .legend-amount {
     font-size: 0.875rem;
     color: var(--gray-900);
-    font-weight: 700;
+    font-weight: 400;
 }
 
 /* ==========================================
@@ -251,7 +345,7 @@
 
 .view-all-btn {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--primary-purple);
     transition: all var(--transition-base);
     display: flex;
@@ -328,7 +422,7 @@
 
 .expense-description {
     font-size: 0.9375rem;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--gray-900);
     margin-bottom: 0.25rem;
 }
@@ -357,7 +451,7 @@
 
 .expense-amount {
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--gray-900);
     flex-shrink: 0;
 }
@@ -417,7 +511,7 @@
     padding: 0.75rem 1.5rem;
     background: var(--gradient-primary);
     color: var(--white);
-    font-weight: 600;
+    font-weight: 400;
     border-radius: var(--radius-md);
     transition: all var(--transition-base);
     box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
@@ -513,7 +607,7 @@
 
 .budget-category-name {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--gray-900);
 }
 
@@ -526,7 +620,7 @@
 
 .budget-spent {
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--gray-900);
 }
 
@@ -560,7 +654,7 @@
 
 .budget-status {
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 400;
 }
 
 .budget-status.safe {
@@ -626,7 +720,7 @@
 
 .category-name {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--gray-900);
 }
 

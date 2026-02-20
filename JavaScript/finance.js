@@ -1,69 +1,129 @@
 /* ==========================================
    OPTIPLAN FINANCE TRACKER - JAVASCRIPT
+   (Database-backed via finance_api.php)
    ========================================== */
 
-// Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ==========================================
-    // STORAGE KEYS
-    // ==========================================
-    const STORAGE_KEYS = {
-        EXPENSES: 'optiplan_expenses',
-        BUDGET: 'optiplan_budget'
-    };
+    const API_URL = '../php/finance_api.php';
 
     // ==========================================
     // EXPENSE DATA MANAGEMENT
     // ==========================================
     class ExpenseManager {
         constructor() {
-            this.expenses = this.loadExpenses();
-            this.budget = this.loadBudget();
-        }
-
-        loadExpenses() {
-            const stored = localStorage.getItem(STORAGE_KEYS.EXPENSES);
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        saveExpenses() {
-            localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(this.expenses));
-        }
-
-        loadBudget() {
-            const stored = localStorage.getItem(STORAGE_KEYS.BUDGET);
-            return stored ? JSON.parse(stored) : {
-                total: 1000,
-                food: 300,
-                transport: 150,
-                shopping: 200,
-                entertainment: 100,
-                education: 150,
-                health: 100,
-                bills: 0,
-                other: 0
+            this.expenses = [];
+            this.budget = {
+                total: 0, food: 0, transport: 0, shopping: 0,
+                entertainment: 0, education: 0, health: 0, bills: 0, other: 0
             };
         }
 
-        saveBudget() {
-            localStorage.setItem(STORAGE_KEYS.BUDGET, JSON.stringify(this.budget));
+        async loadExpenses() {
+            try {
+                const res = await fetch(API_URL + '?action=get_expenses');
+                const data = await res.json();
+                if (data.success) {
+                    this.expenses = data.expenses.map(e => ({
+                        id: parseInt(e.id),
+                        amount: e.amount,
+                        category: e.category,
+                        description: e.description,
+                        date: e.expense_date,
+                        timestamp: e.created_at
+                    }));
+                }
+            } catch (err) {
+                console.error('Failed to load expenses:', err);
+            }
         }
 
-        addExpense(expense) {
-            const newExpense = {
-                id: Date.now(),
-                ...expense,
-                timestamp: new Date().toISOString()
-            };
-            this.expenses.unshift(newExpense);
-            this.saveExpenses();
-            return newExpense;
+        async loadBudget() {
+            try {
+                const res = await fetch(API_URL + '?action=get_budget');
+                const data = await res.json();
+                if (data.success && data.budget) {
+                    const b = data.budget;
+                    this.budget = {
+                        total: parseFloat(b.total_budget) || 0,
+                        food: parseFloat(b.food_budget) || 0,
+                        transport: parseFloat(b.transport_budget) || 0,
+                        shopping: parseFloat(b.shopping_budget) || 0,
+                        entertainment: parseFloat(b.entertainment_budget) || 0,
+                        education: parseFloat(b.education_budget) || 0,
+                        health: parseFloat(b.health_budget) || 0,
+                        bills: parseFloat(b.bills_budget) || 0,
+                        other: parseFloat(b.other_budget) || 0
+                    };
+                }
+            } catch (err) {
+                console.error('Failed to load budget:', err);
+            }
         }
 
-        deleteExpense(id) {
-            this.expenses = this.expenses.filter(exp => exp.id !== id);
-            this.saveExpenses();
+        async addExpense(expense) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add_expense');
+                formData.append('amount', expense.amount);
+                formData.append('category', expense.category);
+                formData.append('description', expense.description || '');
+                formData.append('date', expense.date);
+
+                const res = await fetch(API_URL, { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.success) {
+                    await this.loadExpenses();
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error('Failed to add expense:', err);
+                return false;
+            }
+        }
+
+        async deleteExpense(id) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'delete_expense');
+                formData.append('id', id);
+
+                const res = await fetch(API_URL, { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.success) {
+                    await this.loadExpenses();
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error('Failed to delete expense:', err);
+                return false;
+            }
+        }
+
+        async updateBudget(budgetData) {
+            try {
+                this.budget = { ...this.budget, ...budgetData };
+                const formData = new FormData();
+                formData.append('action', 'save_budget');
+                formData.append('total', this.budget.total);
+                formData.append('food', this.budget.food);
+                formData.append('transport', this.budget.transport);
+                formData.append('shopping', this.budget.shopping);
+                formData.append('entertainment', this.budget.entertainment);
+                formData.append('education', this.budget.education);
+                formData.append('health', this.budget.health);
+                formData.append('bills', this.budget.bills);
+                formData.append('other', this.budget.other);
+
+                const res = await fetch(API_URL, { method: 'POST', body: formData });
+                const data = await res.json();
+                return data.success;
+            } catch (err) {
+                console.error('Failed to save budget:', err);
+                return false;
+            }
         }
 
         getExpensesByPeriod(period) {
@@ -75,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                     break;
                 case 'week':
-                    startDate = new Date(now.setDate(now.getDate() - 7));
+                    startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
                     break;
                 case 'month':
                     startDate = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -98,20 +158,11 @@ document.addEventListener('DOMContentLoaded', function () {
         getCategoryTotals(period = 'month') {
             const expenses = this.getExpensesByPeriod(period);
             const totals = {};
-
             expenses.forEach(exp => {
-                if (!totals[exp.category]) {
-                    totals[exp.category] = 0;
-                }
+                if (!totals[exp.category]) totals[exp.category] = 0;
                 totals[exp.category] += parseFloat(exp.amount);
             });
-
             return totals;
-        }
-
-        updateBudget(budgetData) {
-            this.budget = { ...this.budget, ...budgetData };
-            this.saveBudget();
         }
     }
 
@@ -135,24 +186,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // UI UPDATES
     // ==========================================
     function updateSummaryCards() {
-        // Today's total
         const todayTotal = expenseManager.getTotalByPeriod('today');
         document.getElementById('todayTotal').textContent = `$${todayTotal.toFixed(2)}`;
 
-        // Week total
         const weekTotal = expenseManager.getTotalByPeriod('week');
         document.getElementById('weekTotal').textContent = `$${weekTotal.toFixed(2)}`;
 
-        // Month total
         const monthTotal = expenseManager.getTotalByPeriod('month');
         document.getElementById('monthTotal').textContent = `$${monthTotal.toFixed(2)}`;
 
-        // Budget remaining
         const budgetRemaining = expenseManager.budget.total - monthTotal;
         const remainingEl = document.getElementById('budgetRemaining');
         remainingEl.textContent = `$${budgetRemaining.toFixed(2)}`;
-        
-        // Change color based on budget status
+
         if (budgetRemaining < 0) {
             remainingEl.style.color = '#ef4444';
         } else if (budgetRemaining < expenseManager.budget.total * 0.2) {
@@ -182,9 +228,9 @@ document.addEventListener('DOMContentLoaded', function () {
         expensesList.innerHTML = recentExpenses.map(expense => {
             const category = CATEGORIES[expense.category] || CATEGORIES.other;
             const expenseDate = new Date(expense.date);
-            const formattedDate = expenseDate.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric' 
+            const formattedDate = expenseDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
             });
 
             return `
@@ -216,8 +262,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const category = CATEGORIES[categoryKey];
             const spent = categoryTotals[categoryKey] || 0;
             const limit = expenseManager.budget[categoryKey] || 0;
-            
-            if (limit === 0) return ''; // Don't show categories with no budget
+
+            if (limit === 0) return '';
 
             const percentage = limit > 0 ? (spent / limit) * 100 : 0;
             const status = percentage >= 100 ? 'danger' : percentage >= 80 ? 'warning' : 'safe';
@@ -266,9 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
             colors.push(category.color);
         });
 
-        if (expenseChart) {
-            expenseChart.destroy();
-        }
+        if (expenseChart) expenseChart.destroy();
 
         expenseChart = new Chart(ctx, {
             type: 'doughnut',
@@ -285,9 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
                         backgroundColor: '#1a1625',
                         titleColor: '#e5dff7',
@@ -297,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         padding: 12,
                         displayColors: true,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const label = context.label || '';
                                 const value = context.parsed || 0;
                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -311,15 +353,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Update legend
         updateChartLegend(labels, data, colors);
     }
 
     function updateChartLegend(labels, data, colors) {
         const legendContainer = document.getElementById('chartLegend');
         if (!legendContainer) return;
-
-        const total = data.reduce((a, b) => a + b, 0);
 
         legendContainer.innerHTML = labels.map((label, index) => `
             <div class="legend-item">
@@ -336,7 +375,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('trendsChart');
         if (!ctx) return;
 
-        // Get last 7 days of data
         const last7Days = [];
         const dailyTotals = [];
         const now = new Date();
@@ -345,19 +383,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const date = new Date(now);
             date.setDate(date.getDate() - i);
             const dateStr = date.toISOString().split('T')[0];
-            
+
             last7Days.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
-            
-            const dayExpenses = expenseManager.expenses.filter(exp => 
-                exp.date === dateStr
-            );
+
+            const dayExpenses = expenseManager.expenses.filter(exp => exp.date === dateStr);
             const dayTotal = dayExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
             dailyTotals.push(dayTotal);
         }
 
-        if (trendsChart) {
-            trendsChart.destroy();
-        }
+        if (trendsChart) trendsChart.destroy();
 
         trendsChart = new Chart(ctx, {
             type: 'line',
@@ -382,9 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
                         backgroundColor: '#1a1625',
                         titleColor: '#e5dff7',
@@ -393,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         borderWidth: 1,
                         padding: 12,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return `Spent: $${context.parsed.y.toFixed(2)}`;
                             }
                         }
@@ -402,23 +434,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: 'rgba(167, 139, 250, 0.1)'
-                        },
-                        ticks: {
-                            color: '#d1c7e8',
-                            callback: function(value) {
-                                return '$' + value;
-                            }
-                        }
+                        grid: { color: 'rgba(167, 139, 250, 0.1)' },
+                        ticks: { color: '#d1c7e8', callback: function (value) { return '$' + value; } }
                     },
                     x: {
-                        grid: {
-                            color: 'rgba(167, 139, 250, 0.1)'
-                        },
-                        ticks: {
-                            color: '#d1c7e8'
-                        }
+                        grid: { color: 'rgba(167, 139, 250, 0.1)' },
+                        ticks: { color: '#d1c7e8' }
                     }
                 }
             }
@@ -437,16 +458,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeBudgetModal = document.getElementById('closeBudgetModal');
     const cancelBudget = document.getElementById('cancelBudget');
 
-    // Open expense modal
     if (createBtn) {
         createBtn.addEventListener('click', () => {
             expenseModal.classList.add('active');
-            // Set today's date as default
             document.getElementById('expenseDate').valueAsDate = new Date();
         });
     }
 
-    // Close expense modal
     [closeExpenseModal, cancelExpense].forEach(btn => {
         if (btn) {
             btn.addEventListener('click', () => {
@@ -456,22 +474,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Open budget modal
     if (editBudget) {
         editBudget.addEventListener('click', () => {
             budgetModal.classList.add('active');
-            // Populate current budget values
             document.getElementById('totalBudget').value = expenseManager.budget.total;
             Object.keys(CATEGORIES).forEach(cat => {
                 const input = document.getElementById(`budget${cat.charAt(0).toUpperCase() + cat.slice(1)}`);
-                if (input) {
-                    input.value = expenseManager.budget[cat] || '';
-                }
+                if (input) input.value = expenseManager.budget[cat] || '';
             });
         });
     }
 
-    // Close budget modal
     [closeBudgetModal, cancelBudget].forEach(btn => {
         if (btn) {
             btn.addEventListener('click', () => {
@@ -481,26 +494,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Close modals on outside click
     [expenseModal, budgetModal].forEach(modal => {
         if (modal) {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                }
+                if (e.target === modal) modal.classList.remove('active');
             });
         }
     });
-
 
     // ==========================================
     // FORM SUBMISSIONS
     // ==========================================
     const expenseForm = document.getElementById('expenseForm');
     if (expenseForm) {
-        expenseForm.addEventListener('submit', (e) => {
+        expenseForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const formData = new FormData(expenseForm);
             const expense = {
                 amount: formData.get('amount'),
@@ -509,53 +518,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 date: formData.get('date')
             };
 
-            expenseManager.addExpense(expense);
-            
-            // Update UI
-            updateSummaryCards();
-            renderExpensesList();
-            createExpenseChart(currentPeriod);
-            createTrendsChart();
-            renderBudgetCategories();
-            
-            // Close modal and reset form
-            expenseModal.classList.remove('active');
-            expenseForm.reset();
-            
-            // Show success notification
-            showNotification('Expense added successfully!', 'success');
+            const success = await expenseManager.addExpense(expense);
+
+            if (success) {
+                updateSummaryCards();
+                renderExpensesList();
+                createExpenseChart(currentPeriod);
+                createTrendsChart();
+                renderBudgetCategories();
+
+                expenseModal.classList.remove('active');
+                expenseForm.reset();
+                showNotification('Expense added successfully!', 'success');
+            } else {
+                showNotification('Failed to add expense', 'error');
+            }
         });
     }
 
     const budgetForm = document.getElementById('budgetForm');
     if (budgetForm) {
-        budgetForm.addEventListener('submit', (e) => {
+        budgetForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const formData = new FormData(budgetForm);
             const budgetData = {
                 total: parseFloat(formData.get('totalBudget')) || 0
             };
 
-            // Get category budgets
             Object.keys(CATEGORIES).forEach(cat => {
                 const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
                 const value = formData.get(`budget${catName}`);
                 budgetData[cat] = value ? parseFloat(value) : 0;
             });
 
-            expenseManager.updateBudget(budgetData);
-            
-            // Update UI
-            updateSummaryCards();
-            renderBudgetCategories();
-            
-            // Close modal and reset form
-            budgetModal.classList.remove('active');
-            budgetForm.reset();
-            
-            // Show success notification
-            showNotification('Budget updated successfully!', 'success');
+            const success = await expenseManager.updateBudget(budgetData);
+
+            if (success) {
+                updateSummaryCards();
+                renderBudgetCategories();
+                budgetModal.classList.remove('active');
+                budgetForm.reset();
+                showNotification('Budget updated successfully!', 'success');
+            } else {
+                showNotification('Failed to save budget', 'error');
+            }
         });
     }
 
@@ -564,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==========================================
     let currentPeriod = 'week';
     const filterButtons = document.querySelectorAll('.filter-btn');
-    
+
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             filterButtons.forEach(b => b.classList.remove('active'));
@@ -577,15 +584,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==========================================
     // DELETE EXPENSE
     // ==========================================
-    window.deleteExpense = function(id) {
+    window.deleteExpense = async function (id) {
         if (confirm('Are you sure you want to delete this expense?')) {
-            expenseManager.deleteExpense(id);
-            updateSummaryCards();
-            renderExpensesList();
-            createExpenseChart(currentPeriod);
-            createTrendsChart();
-            renderBudgetCategories();
-            showNotification('Expense deleted', 'success');
+            const success = await expenseManager.deleteExpense(id);
+            if (success) {
+                updateSummaryCards();
+                renderExpensesList();
+                createExpenseChart(currentPeriod);
+                createTrendsChart();
+                renderBudgetCategories();
+                showNotification('Expense deleted', 'success');
+            }
         }
     };
 
@@ -593,7 +602,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // NOTIFICATIONS
     // ==========================================
     function showNotification(message, type = 'info') {
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
@@ -604,61 +612,99 @@ document.addEventListener('DOMContentLoaded', function () {
                 <span>${message}</span>
             </div>
         `;
-
-        // Add to page
         document.body.appendChild(notification);
-
-        // Animate in
         setTimeout(() => notification.classList.add('show'), 10);
-
-        // Remove after 3 seconds
         setTimeout(() => {
             notification.classList.remove('show');
             setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
 
-    // Add notification styles dynamically
     const notificationStyles = document.createElement('style');
     notificationStyles.textContent = `
         .notification {
-            position: fixed;
-            top: 100px;
-            right: 2rem;
+            position: fixed; top: 100px; right: 2rem;
             background: var(--dark-surface);
             border: 1px solid rgba(167, 139, 250, 0.3);
             border-radius: var(--radius-md);
             padding: 1rem 1.5rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 10000;
-            opacity: 0;
+            z-index: 10000; opacity: 0;
             transform: translateX(100px);
             transition: all 0.3s ease;
         }
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .notification-icon {
-            width: 24px;
-            height: 24px;
-            color: #10b981;
-        }
-        .notification-success {
-            border-left: 4px solid #10b981;
-        }
+        .notification.show { opacity: 1; transform: translateX(0); }
+        .notification-content { display: flex; align-items: center; gap: 0.75rem; }
+        .notification-icon { width: 24px; height: 24px; color: #10b981; }
+        .notification-success { border-left: 4px solid #10b981; }
     `;
     document.head.appendChild(notificationStyles);
 
     // ==========================================
+    // BUDGET REMAINING CARD — INLINE EDIT
+    // ==========================================
+    const budgetCardEditBtn = document.getElementById('budgetCardEditBtn');
+    if (budgetCardEditBtn) {
+        budgetCardEditBtn.addEventListener('click', function () {
+            const summaryContent = document.getElementById('budgetCardContent');
+            if (!summaryContent) return;
+
+            const currentTotal = expenseManager.budget.total;
+            const originalHTML = summaryContent.innerHTML;
+
+            summaryContent.innerHTML = `
+                <p class="summary-label">Set Total Budget ($)</p>
+                <div class="budget-inline-edit">
+                    <input type="number" id="budgetInlineInput" class="budget-inline-input"
+                           value="${currentTotal}" step="0.01" min="0" placeholder="0.00">
+                    <div class="budget-inline-actions">
+                        <button id="budgetInlineSave" class="budget-inline-save">&#10003; Save</button>
+                        <button id="budgetInlineCancel" class="budget-inline-cancel">&#10005;</button>
+                    </div>
+                </div>
+            `;
+
+            budgetCardEditBtn.style.opacity = '0';
+            budgetCardEditBtn.style.pointerEvents = 'none';
+
+            const input = document.getElementById('budgetInlineInput');
+            input.focus();
+            input.select();
+
+            async function saveEdit() {
+                const newTotal = parseFloat(input.value);
+                restore();
+                if (!isNaN(newTotal) && newTotal >= 0) {
+                    await expenseManager.updateBudget({ total: newTotal });
+                    updateSummaryCards();
+                    renderBudgetCategories();
+                    showNotification('Budget updated successfully!', 'success');
+                }
+            }
+
+            function restore() {
+                summaryContent.innerHTML = originalHTML;
+                budgetCardEditBtn.style.opacity = '';
+                budgetCardEditBtn.style.pointerEvents = '';
+            }
+
+            document.getElementById('budgetInlineSave').addEventListener('click', saveEdit);
+            document.getElementById('budgetInlineCancel').addEventListener('click', restore);
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') saveEdit();
+                if (e.key === 'Escape') restore();
+            });
+        });
+    }
+
+    // ==========================================
     // INITIALIZE
     // ==========================================
-    function init() {
+    async function init() {
+        await Promise.all([
+            expenseManager.loadExpenses(),
+            expenseManager.loadBudget()
+        ]);
         updateSummaryCards();
         renderExpensesList();
         createExpenseChart(currentPeriod);
@@ -666,9 +712,6 @@ document.addEventListener('DOMContentLoaded', function () {
         renderBudgetCategories();
     }
 
-    // Run initialization
     init();
-
-    // Log for debugging
-    console.log('Finance tracker initialized');
+    console.log('Finance tracker initialized (database mode)');
 });

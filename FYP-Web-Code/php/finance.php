@@ -17,6 +17,9 @@ $user_level = 19;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finance Tracker - OptiPlan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="../css/finance.css">
@@ -192,10 +195,15 @@ $user_level = 19;
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <div class="summary-content">
+                    <div class="summary-content" id="budgetCardContent">
                         <p class="summary-label">Budget Remaining</p>
-                        <h2 class="summary-amount" id="budgetRemaining">$1000.00</h2>
+                        <h2 class="summary-amount" id="budgetRemaining">$0.00</h2>
                     </div>
+                    <button class="budget-card-edit-btn" id="budgetCardEditBtn" title="Edit total budget">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </button>
                 </div>
             </section>
             
@@ -431,7 +439,7 @@ $user_level = 19;
     </div>
     
     <!-- Scripts at bottom - IMPORTANT ORDER -->
-    <script src="../JavaScript/dashboard.js"></script>
-    <script src="../JavaScript/finance.js"></script>
+    <script src="../../JavaScript/dashboard.js"></script>
+    <script src="../../JavaScript/finance.js"></script>
 </body>
 </html>

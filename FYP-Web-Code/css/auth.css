@@ -35,7 +35,7 @@
     --gradient-card: linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(232, 121, 249, 0.1) 100%);
     
     /* Typography */
-    --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     
     /* Spacing */
@@ -64,7 +64,7 @@
 /* ==========================================
    FONT IMPORTS
    ========================================== */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap');
 
 /* ==========================================
    GLOBAL RESET & BASE STYLES
@@ -82,6 +82,8 @@ html {
 body {
     font-family: var(--font-body);
     font-size: 16px;
+    font-weight: 300;
+    letter-spacing: -0.01em;
     line-height: 1.6;
     color: var(--gray-700);
     background: var(--dark-bg);
@@ -150,7 +152,7 @@ body::after {
     gap: 0.75rem;
     font-family: var(--font-display);
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--gray-900);
     text-decoration: none;
     transition: transform var(--transition-base);
@@ -189,7 +191,7 @@ body::after {
 .auth-content-title {
     font-family: var(--font-display);
     font-size: 3rem;
-    font-weight: 800;
+    font-weight: 400;
     color: var(--gray-900);
     margin-bottom: 1.5rem;
     line-height: 1.2;
@@ -233,7 +235,7 @@ body::after {
 .form-title {
     font-family: var(--font-display);
     font-size: 2rem;
-    font-weight: 800;
+    font-weight: 400;
     color: var(--gray-900);
     margin-bottom: 0.5rem;
 }
@@ -245,7 +247,7 @@ body::after {
 
 .form-subtitle a {
     color: var(--primary-purple);
-    font-weight: 600;
+    font-weight: 400;
     text-decoration: none;
     transition: color var(--transition-base);
 }
@@ -280,7 +282,7 @@ body::after {
 
 .form-label {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--gray-700);
     display: block;
 }
@@ -367,7 +369,7 @@ body::after {
 .forgot-link {
     color: var(--primary-purple);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 300;
     transition: color var(--transition-base);
 }
 
@@ -383,7 +385,7 @@ body::after {
     padding: 1rem;
     background: var(--gradient-primary);
     color: var(--white);
-    font-weight: 600;
+    font-weight: 400;
     font-size: 1rem;
     border: none;
     border-radius: var(--radius-md);
@@ -449,7 +451,7 @@ body::after {
     border: 1px solid rgba(167, 139, 250, 0.2);
     border-radius: var(--radius-md);
     color: var(--gray-700);
-    font-weight: 500;
+    font-weight: 300;
     font-size: 0.9375rem;
     cursor: pointer;
     transition: all var(--transition-base);

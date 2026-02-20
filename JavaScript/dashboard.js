@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
     if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('mobile-active'));
-    if (createBtn) createBtn.addEventListener('click', () => modal.classList.add('active'));
+    if (createBtn) createBtn.addEventListener('click', () => { if (modal) modal.classList.add('active'); });
     if (closeModal) closeModal.addEventListener('click', () => modal.classList.remove('active'));
     if (cancelBtn) cancelBtn.addEventListener('click', () => modal.classList.remove('active'));
 
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function loadBudget() {
             const s = localStorage.getItem(BUDGET_KEY);
-            return s ? JSON.parse(s) : { total: 1000 };
+            return s ? JSON.parse(s) : { total: 0 };
         }
 
         function loadFinanceSettings() {

@@ -280,6 +280,41 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                 </div>
             </section>
 
+            <section class="finance-section">
+                <div class="section-header">
+                    <h2 class="section-title">Finance</h2>
+                    <a href="finance.php" class="view-all-link">View All →</a>
+                </div>
+                <div class="finance-widget">
+                    <div class="finance-stats-col">
+                        <div class="finance-quick-stat">
+                            <div class="fq-label">Budget Remaining</div>
+                            <div class="fq-value" id="dashBudgetRemaining">$0.00</div>
+                        </div>
+                        <div class="finance-quick-stat">
+                            <div class="fq-label">This Month</div>
+                            <div class="fq-value" id="dashMonthTotal">$0.00</div>
+                        </div>
+                        <div class="finance-quick-stat">
+                            <div class="fq-label">Today</div>
+                            <div class="fq-value" id="dashTodayTotal">$0.00</div>
+                        </div>
+                    </div>
+                    <div class="finance-expenses-col">
+                        <div class="finance-expenses-header">
+                            <span>Recent Expenses</span>
+                            <button class="dash-add-btn" id="dashAddExpenseBtn">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Add Expense
+                            </button>
+                        </div>
+                        <div id="dashRecentExpenses">
+                            <p class="dash-no-expenses">No expenses yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="progress-section">
 
 
@@ -385,5 +420,50 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
         </div>
     </div>
 
+    <div class="modal" id="financeSettingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Budget Setup</h2>
+                <div class="modal-close" id="closeFinanceSettings">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+            </div>
+            <form class="modal-form" id="financeSettingsForm">
+                <div class="form-group">
+                    <label for="fsStartingBalance">Starting Balance ($)</label>
+                    <input type="number" id="fsStartingBalance" step="0.01" min="0" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="fsMonthlyIncome">Main Income ($)</label>
+                    <input type="number" id="fsMonthlyIncome" step="0.01" min="0" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="fsSideIncome">Side Income ($)</label>
+                    <input type="number" id="fsSideIncome" step="0.01" min="0" placeholder="0.00">
+                </div>
+
+                <div class="finance-modal-summary">
+                    <div class="fmt-row">
+                        <span class="fmt-label">Total Budget</span>
+                        <span class="fmt-value" id="fmsTotal">$0.00</span>
+                    </div>
+                    <div class="fmt-divider"></div>
+                    <div class="fmt-row fmt-highlight">
+                        <span class="fmt-label">Budget Remaining</span>
+                        <span class="fmt-value" id="fmsRemaining">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelFinanceSettings">Cancel</button>
+                    <button type="submit" class="create-btn" style="border:none; padding:0.5rem 1rem; border-radius:0.5rem;">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../../JavaScript/dashboard.js"></script>
+    <script src="../../JavaScript/finance.js"></script>
 </body>

@@ -200,6 +200,178 @@ document.addEventListener('DOMContentLoaded', function() {
 
         fetchAllEvents();
     }
+
+    // --- 5. FINANCE SECTION LOGIC ---
+    (function() {
+        const EXPENSES_KEY  = 'optiplan_expenses';
+        const BUDGET_KEY    = 'optiplan_budget';
+        const SETTINGS_KEY  = 'optiplan_finance_settings';
+        const CAT_ICONS     = {
+            food: '🍔', transport: '🚗', shopping: '🛍️',
+            entertainment: '🎮', education: '📚', health: '⚕️',
+            bills: '💳', other: '📦'
+        };
+
+        function loadExpenses() {
+            const s = localStorage.getItem(EXPENSES_KEY);
+            return s ? JSON.parse(s) : [];
+        }
+
+        function loadBudget() {
+            const s = localStorage.getItem(BUDGET_KEY);
+            return s ? JSON.parse(s) : { total: 1000 };
+        }
+
+        function loadFinanceSettings() {
+            const s = localStorage.getItem(SETTINGS_KEY);
+            return s ? JSON.parse(s) : { startingBalance: 0, monthlyIncome: 0, sideIncome: 0 };
+        }
+
+        function syncBudgetTotal(settings) {
+            const total  = settings.startingBalance + settings.monthlyIncome + settings.sideIncome;
+            const budget = loadBudget();
+            budget.total = total > 0 ? total : budget.total;
+            localStorage.setItem(BUDGET_KEY, JSON.stringify(budget));
+        }
+
+        function getPeriodTotal(expenses, period) {
+            const now = new Date();
+            const start = period === 'today'
+                ? new Date(now.getFullYear(), now.getMonth(), now.getDate())
+                : new Date(now.getFullYear(), now.getMonth(), 1);
+            return expenses
+                .filter(e => new Date(e.date) >= start)
+                .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+        }
+
+        function updateFinanceModalSummary() {
+            const sbEl = document.getElementById('fsStartingBalance');
+            const miEl = document.getElementById('fsMonthlyIncome');
+            const siEl = document.getElementById('fsSideIncome');
+            if (!sbEl || !miEl || !siEl) return;
+
+            const sb = parseFloat(sbEl.value) || 0;
+            const mi = parseFloat(miEl.value) || 0;
+            const si = parseFloat(siEl.value) || 0;
+            const total      = sb + mi + si;
+            const monthSpent = getPeriodTotal(loadExpenses(), 'month');
+            const remaining  = total - monthSpent;
+
+            const totalEl  = document.getElementById('fmsTotal');
+            const remainEl = document.getElementById('fmsRemaining');
+            if (totalEl)  totalEl.textContent  = `$${total.toFixed(2)}`;
+            if (remainEl) {
+                remainEl.textContent = `$${remaining.toFixed(2)}`;
+                remainEl.style.color = remaining < 0
+                    ? '#ef4444'
+                    : (total > 0 && remaining < total * 0.2) ? '#f59e0b' : '#10b981';
+            }
+        }
+
+        function updateFinanceStats() {
+            const expenses = loadExpenses();
+            const budget   = loadBudget();
+            const month    = getPeriodTotal(expenses, 'month');
+            const today    = getPeriodTotal(expenses, 'today');
+            const remaining = budget.total - month;
+
+            const remEl = document.getElementById('dashBudgetRemaining');
+            if (remEl) {
+                remEl.textContent = `$${remaining.toFixed(2)}`;
+                remEl.style.color = remaining < 0
+                    ? '#ef4444'
+                    : remaining < budget.total * 0.2 ? '#f59e0b' : '#10b981';
+            }
+            const mEl = document.getElementById('dashMonthTotal');
+            if (mEl) mEl.textContent = `$${month.toFixed(2)}`;
+            const tEl = document.getElementById('dashTodayTotal');
+            if (tEl) tEl.textContent = `$${today.toFixed(2)}`;
+        }
+
+        function renderRecentExpenses() {
+            const container = document.getElementById('dashRecentExpenses');
+            if (!container) return;
+            const recent = loadExpenses().slice(0, 3);
+            if (recent.length === 0) {
+                container.innerHTML = '<p class="dash-no-expenses">No expenses yet.</p>';
+                return;
+            }
+            container.innerHTML = recent.map(exp => {
+                const icon = CAT_ICONS[exp.category] || '📦';
+                const dateStr = new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                return `
+                    <div class="dash-expense-item">
+                        <span class="dash-exp-icon">${icon}</span>
+                        <div class="dash-exp-details">
+                            <span class="dash-exp-desc">${exp.description || exp.category}</span>
+                            <span class="dash-exp-date">${dateStr}</span>
+                        </div>
+                        <span class="dash-exp-amount">$${parseFloat(exp.amount).toFixed(2)}</span>
+                    </div>`;
+            }).join('');
+        }
+
+        // --- Finance Settings Modal ---
+        const dashManageBtn         = document.getElementById('dashAddExpenseBtn');
+        const financeSettingsModal  = document.getElementById('financeSettingsModal');
+        const closeFinanceSettings  = document.getElementById('closeFinanceSettings');
+        const cancelFinanceSettings = document.getElementById('cancelFinanceSettings');
+        const financeSettingsForm   = document.getElementById('financeSettingsForm');
+
+        function openFinanceSettingsModal() {
+            if (!financeSettingsModal) return;
+            const s = loadFinanceSettings();
+            const sb = document.getElementById('fsStartingBalance');
+            const mi = document.getElementById('fsMonthlyIncome');
+            const si = document.getElementById('fsSideIncome');
+            if (sb) sb.value = s.startingBalance || '';
+            if (mi) mi.value = s.monthlyIncome   || '';
+            if (si) si.value = s.sideIncome       || '';
+            financeSettingsModal.classList.add('active');
+            updateFinanceModalSummary();
+        }
+
+        function closeFinanceSettingsModal() {
+            if (!financeSettingsModal) return;
+            financeSettingsModal.classList.remove('active');
+            if (financeSettingsForm) financeSettingsForm.reset();
+        }
+
+        if (dashManageBtn)         dashManageBtn.addEventListener('click', openFinanceSettingsModal);
+        if (closeFinanceSettings)  closeFinanceSettings.addEventListener('click', closeFinanceSettingsModal);
+        if (cancelFinanceSettings) cancelFinanceSettings.addEventListener('click', closeFinanceSettingsModal);
+
+        // Live calculation: update summary as user types
+        ['fsStartingBalance', 'fsMonthlyIncome', 'fsSideIncome'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', updateFinanceModalSummary);
+        });
+
+        if (financeSettingsModal) {
+            financeSettingsModal.addEventListener('click', e => {
+                if (e.target === financeSettingsModal) closeFinanceSettingsModal();
+            });
+        }
+
+        if (financeSettingsForm) {
+            financeSettingsForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const settings = {
+                    startingBalance: parseFloat(document.getElementById('fsStartingBalance').value) || 0,
+                    monthlyIncome:   parseFloat(document.getElementById('fsMonthlyIncome').value)   || 0,
+                    sideIncome:      parseFloat(document.getElementById('fsSideIncome').value)       || 0
+                };
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+                syncBudgetTotal(settings);
+                updateFinanceStats();
+                closeFinanceSettingsModal();
+            });
+        }
+
+        // Init
+        updateFinanceStats();
+        renderRecentExpenses();
+    })();
 });
 
 // --- 5. COMPLETE TASK LOGIC (Global) ---

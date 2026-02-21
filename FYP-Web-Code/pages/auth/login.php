@@ -1,56 +1,67 @@
 <?php
 // --- TOP OF FILE: Logic Header ---
-require_once 'db.php';
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
+require_once __DIR__ . '/../../includes/db.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
 
-    // 1. Collect and Clean Data
-    $firstName = trim($_POST['first_name'] ?? '');
-    $lastName  = trim($_POST['last_name'] ?? '');
-    $email     = trim($_POST['email'] ?? '');
-    $password  = $_POST['password'] ?? '';
-    $confirm   = $_POST['confirm_password'] ?? '';
+    // Rate limit: 10 login attempts per 15 minutes per IP
+    enforce_rate_limit($pdo, 'login', 10, 900);
 
-    // 2. Validation
-    if (empty($firstName) || empty($email) || strlen($password) < 8) {
-        echo json_encode(['success' => false, 'message' => 'Please fill all fields. Password must be 8+ chars.']);
+    // CSRF validation
+    csrf_enforce();
+
+    // Input validation — only accept expected fields
+    $input = filter_input_fields(['email', 'password', 'csrf_token', 'remember']);
+    $email = validate_email($input['email'] ?? '');
+    $password = $input['password'] ?? '';
+
+    if ($email === false) {
+        echo json_encode(['success' => false, 'message' => 'Please enter a valid email address.']);
         exit;
     }
 
-    if ($password !== $confirm) {
-        echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
+    if (strlen($password) === 0 || strlen($password) > 128) {
+        echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
         exit;
     }
 
-    // 3. Database Operation
     try {
-        $hash = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password_hash) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$firstName, $lastName, $email, $hash]);
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
 
-        // Get the newly created user's ID
-        $userId = $pdo->lastInsertId();
+        if ($user && password_verify($password, $user['password_hash'])) {
+            // Regenerate session ID to prevent session fixation
+            session_regenerate_id(true);
 
-        // Automatically log in the user
-        $_SESSION['user_id'] = $userId;
-        $_SESSION['role'] = 'user';
-        $_SESSION['name'] = $firstName;
+            // Store data in Session
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['name'] = $user['first_name'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['username'] = $user['username'] ?? '';
+            $_SESSION['pfp_path'] = $user['pfp_path'] ?? '';
 
-        echo json_encode([
-            'success' => true,
-            'message' => 'Account created! Redirecting to dashboard...',
-            'redirect' => 'dashboard.php'
-        ]);
-    } catch (PDOException $e) {
-        if ($e->getCode() == 23000) { // Integrity constraint violation (duplicate email)
-            echo json_encode(['success' => false, 'message' => 'Email already registered.']);
+            // Determine redirect target based on role
+            $redirect = ($user['role'] === 'admin') ? '../admin/admin.php' : '../dashboard/dashboard.php';
+
+            echo json_encode([
+                'success' => true,
+                'redirect' => $redirect
+            ]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Database error.']);
+            // Generic message to prevent user enumeration
+            echo json_encode(['success' => false, 'message' => 'Invalid email or password.']);
         }
+    } catch (PDOException $e) {
+        error_log('Login error: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'An error occurred. Please try again.']);
     }
-    exit; // Stop execution so no HTML is sent during an AJAX request
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -58,16 +69,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OptiPlan - Sign Up</title>
+    <title>OptiPlan - Sign In</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="auth.css">
 </head>
 <body>
     <!-- Logo Header -->
     <div class="logo-header">
-        <a href="index.php" class="logo-link">
+        <a href="../landing/index.php" class="logo-link">
             <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
@@ -79,54 +90,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="auth-container">
         <!-- Left Side Content -->
         <div class="auth-content">
-            <h1 class="auth-content-title">One Dashboard. <span class="gradient-text">Everything Organized.</span></h1>
-            <p class="auth-content-description">Stop switching between apps. OptiPlan unifies your schedule, studies, and budget into one intelligent platform designed for students and young professionals.</p>
+            <h1 class="auth-content-title">Welcome back to <span class="gradient-text">OptiPlan</span></h1>
+            <p class="auth-content-description">Your intelligent productivity companion is ready to help you achieve more.</p>
         </div>
 
         <!-- Right Side Form Wrapper -->
         <div class="auth-form-wrapper">
             <div class="auth-card">
                 <div class="form-header">
-                    <h1 class="form-title">Create Account</h1>
-                    <p class="form-subtitle">Already have an account? <a href="login.php">Sign in</a></p>
+                    <h1 class="form-title">Welcome Back</h1>
+                    <p class="form-subtitle">Don't have an account? <a href="signup.php">Sign up</a></p>
                 </div>
 
                 <div class="error-message" id="errorMessage"></div>
-                <div class="success-message" id="successMessage"></div>
-
-                <form class="auth-form" method="POST" action="signup.php" id="signupForm">
-                    <div class="form-group row">
-                        <div>
-                            <label class="form-label" for="firstName">First name</label>
-                            <input
-                                type="text"
-                                id="firstName"
-                                name="first_name"
-                                class="form-input"
-                                placeholder="John"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label class="form-label" for="lastName">Last name</label>
-                            <input
-                                type="text"
-                                id="lastName"
-                                name="last_name"
-                                class="form-input"
-                                placeholder="Doe"
-                                required
-                            />
-                        </div>
-                    </div>
-
+                
+                <form class="auth-form" method="POST" action="login.php" id="loginForm">
+                    <?php echo csrf_field(); ?>
                     <div class="form-group">
                         <label class="form-label" for="email">Email address</label>
-                        <input
-                            type="email"
-                            id="email"
+                        <input 
+                            type="email" 
+                            id="email" 
                             name="email"
-                            class="form-input"
+                            class="form-input" 
                             placeholder="you@example.com"
                             required
                         />
@@ -135,14 +121,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label class="form-label" for="password">Password</label>
                         <div class="password-input-wrapper">
-                            <input
-                                type="password"
-                                id="password"
+                            <input 
+                                type="password" 
+                                id="password" 
                                 name="password"
-                                class="form-input"
-                                placeholder="Create a strong password"
+                                class="form-input" 
+                                placeholder="Enter your password"
                                 required
-                                minlength="8"
                             />
                             <button type="button" class="toggle-password" onclick="togglePassword('password')">
                                 <svg id="eyeIcon-password" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,33 +138,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="confirmPassword">Confirm password</label>
-                        <div class="password-input-wrapper">
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                name="confirm_password"
-                                class="form-input"
-                                placeholder="Re-enter your password"
-                                required
-                                minlength="8"
-                            />
-                            <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
-                                <svg id="eyeIcon-confirmPassword" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </button>
+                    <div class="form-options">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="rememberMe" name="remember" />
+                            <label for="rememberMe">Remember me</label>
                         </div>
+                        <a href="forgot-password.php" class="forgot-link">Forgot password?</a>
                     </div>
 
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="agreeTerms" name="agree_terms" required />
-                        <label for="agreeTerms">I agree to the Terms of Service and Privacy Policy</label>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Create Account</button>
+                    <button type="submit" class="btn-submit">Sign In</button>
                 </form>
 
                 <div class="divider">
@@ -212,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById('eyeIcon-' + inputId);
-
+            
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.innerHTML = `
@@ -237,72 +204,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }, 5000);
         }
 
-        // Show success message
-        function showSuccess(message) {
-            const successElement = document.getElementById('successMessage');
-            successElement.textContent = message;
-            successElement.classList.add('show');
-            setTimeout(() => {
-                successElement.classList.remove('show');
-            }, 5000);
-        }
-
-        // Client-side validation
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const agreeTerms = document.getElementById('agreeTerms').checked;
-
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                showError('Passwords do not match');
-                return;
-            }
-
-            // Validate password strength
-            if (password.length < 8) {
-                showError('Password must be at least 8 characters long');
-                return;
-            }
-
-            // Validate terms acceptance
-            if (!agreeTerms) {
-                showError('You must agree to the Terms of Service');
-                return;
-            }
-
+            
+            setButtonLoading('.btn-submit', true); 
+            
             const formData = new FormData(this);
-
-            // Send AJAX request to signup.php
-            fetch('signup.php', {
+            
+            fetch('login.php', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showSuccess(data.message || 'Account created successfully! Redirecting...');
-                    setTimeout(() => {
-                        window.location.href = data.redirect || 'dashboard.php';
-                    }, 1500);
+                    window.location.href = data.redirect || '../dashboard/dashboard.php';
                 } else {
-                    showError(data.message || 'Registration failed. Please try again.');
+                    showError(data.message || 'Invalid email or password');
+                    setButtonLoading('.btn-submit', false); 
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 showError('An error occurred. Please try again.');
+
+                setButtonLoading('.btn-submit', false); 
             });
         });
 
         // Handle Social Login
         function handleSocialLogin(provider) {
-            console.log('Signing up with:', provider);
+            console.log('Logging in with:', provider);
             alert(`Redirecting to ${provider} authentication...`);
             // Implement actual OAuth flow here
             // window.location.href = 'auth/' + provider;
+        }   
+
+        function setButtonLoading(buttonSelector, isLoading) {
+            const btn = document.querySelector(buttonSelector);
+            if (!btn) return;
+            
+            if (isLoading) {
+                btn.disabled = true;
+                btn.dataset.originalText = btn.innerHTML;
+                btn.innerHTML = 'Processing...'; 
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.originalText || 'Sign In';
+            }
         }
     </script>
 </body>

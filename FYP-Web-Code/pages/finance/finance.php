@@ -1,9 +1,11 @@
 <?php
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
 session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../auth/login.php");
     exit();
 }
 
@@ -20,9 +22,9 @@ $user_level = 19;
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../css/finance.css">
+    <link rel="stylesheet" href="../landing/styles.css">
+    <link rel="stylesheet" href="../dashboard/dashboard.css">
+    <link rel="stylesheet" href="finance.css">
     <!-- Chart.js CDN - MUST BE IN HEAD -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
@@ -38,7 +40,7 @@ $user_level = 19;
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="index.php" class="sidebar-logo">
+            <a href="../landing/index.php" class="sidebar-logo">
                 <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
@@ -59,7 +61,7 @@ $user_level = 19;
                 <span class="nav-text">Add Expense</span>
             </button>
             
-            <a href="dashboard.php" class="nav-item">
+            <a href="../dashboard/dashboard.php" class="nav-item">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
@@ -103,7 +105,7 @@ $user_level = 19;
         </nav>
         
         <div class="sidebar-footer">
-            <a href="logout.php" class="nav-item logout-btn">
+            <a href="../auth/logout.php" class="nav-item logout-btn">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -438,8 +440,10 @@ $user_level = 19;
         </div>
     </div>
     
+    <!-- CSRF token for AJAX requests -->
+    <script>window.CSRF_TOKEN = <?php echo json_encode(csrf_token()); ?>;</script>
     <!-- Scripts at bottom - IMPORTANT ORDER -->
-    <script src="../../JavaScript/dashboard.js"></script>
-    <script src="../../JavaScript/finance.js"></script>
+    <script src="../dashboard/dashboard.js"></script>
+    <script src="finance.js"></script>
 </body>
 </html>

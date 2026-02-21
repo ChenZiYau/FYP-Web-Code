@@ -683,9 +683,11 @@ img {
     border-radius: var(--radius-md);
 }
 
-.card-content h3 {
+.card-content .card-title {
     font-size: 1rem;
+    font-weight: 600;
     margin-bottom: 0.25rem;
+    color: #ffffff;
 }
 
 .card-content p {
@@ -1472,7 +1474,7 @@ img {
     gap: 2rem;
 }
 
-.footer-column h4 {
+.footer-column h3 {
     color: var(--gray-800);
     font-size: 0.875rem;
     font-weight: 400;

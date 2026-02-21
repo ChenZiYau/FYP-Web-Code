@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
 session_start();
 header('Content-Type: application/json');
 
@@ -8,10 +10,18 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once 'db.php';
+require_once __DIR__ . '/../../includes/db.php';
 
-$user_id = $_SESSION['user_id'];
+$user_id = (int) $_SESSION['user_id'];
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
+
+// Rate limit: 60 finance API calls per 15 minutes
+enforce_rate_limit($pdo, 'finance_api', 60, 900);
+
+// CSRF enforcement for state-changing operations
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_enforce();
+}
 
 switch ($action) {
 
@@ -25,17 +35,25 @@ switch ($action) {
 
     // ─── ADD EXPENSE ───
     case 'add_expense':
-        $amount      = floatval($_POST['amount'] ?? 0);
-        $category    = $_POST['category'] ?? 'other';
-        $description = trim($_POST['description'] ?? '');
-        $date        = $_POST['date'] ?? date('Y-m-d');
+        $input = filter_input_fields(['amount', 'category', 'description', 'date', 'action', 'csrf_token']);
 
-        $allowed = ['food','transport','shopping','entertainment','education','health','bills','other'];
-        if (!in_array($category, $allowed)) $category = 'other';
-        if ($amount <= 0) {
-            echo json_encode(['success' => false, 'message' => 'Amount must be greater than 0']);
+        $amount = validate_amount($input['amount'] ?? 0);
+        if ($amount === false || $amount <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Amount must be a positive number.']);
             break;
         }
+
+        $category = validate_enum(
+            $input['category'] ?? '',
+            ['food','transport','shopping','entertainment','education','health','bills','other'],
+            'other'
+        );
+
+        $description = validate_string($input['description'] ?? '', 0, 255);
+        if ($description === false) $description = '';
+
+        $date = validate_date($input['date'] ?? '');
+        if ($date === false) $date = date('Y-m-d');
 
         $stmt = $pdo->prepare("INSERT INTO expenses (user_id, amount, category, description, expense_date) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$user_id, $amount, $category, $description, $date]);
@@ -46,7 +64,12 @@ switch ($action) {
 
     // ─── DELETE EXPENSE ───
     case 'delete_expense':
-        $id = intval($_POST['id'] ?? 0);
+        $id = validate_positive_int($_POST['id'] ?? 0);
+        if ($id === false) {
+            echo json_encode(['success' => false, 'message' => 'Invalid expense ID.']);
+            break;
+        }
+        // Ownership check: only delete expenses belonging to this user
         $stmt = $pdo->prepare("DELETE FROM expenses WHERE id = ? AND user_id = ?");
         $stmt->execute([$id, $user_id]);
         echo json_encode(['success' => true, 'message' => 'Expense deleted']);
@@ -70,15 +93,15 @@ switch ($action) {
 
     // ─── SAVE BUDGET ───
     case 'save_budget':
-        $total         = floatval($_POST['total'] ?? 0);
-        $food          = floatval($_POST['food'] ?? 0);
-        $transport     = floatval($_POST['transport'] ?? 0);
-        $shopping      = floatval($_POST['shopping'] ?? 0);
-        $entertainment = floatval($_POST['entertainment'] ?? 0);
-        $education     = floatval($_POST['education'] ?? 0);
-        $health        = floatval($_POST['health'] ?? 0);
-        $bills         = floatval($_POST['bills'] ?? 0);
-        $other         = floatval($_POST['other'] ?? 0);
+        $input = filter_input_fields(['total', 'food', 'transport', 'shopping', 'entertainment', 'education', 'health', 'bills', 'other', 'action', 'csrf_token']);
+
+        // Validate all budget amounts
+        $fields = ['total', 'food', 'transport', 'shopping', 'entertainment', 'education', 'health', 'bills', 'other'];
+        $values = [];
+        foreach ($fields as $f) {
+            $val = validate_amount($input[$f] ?? 0);
+            $values[$f] = ($val === false) ? 0.0 : $val;
+        }
 
         $stmt = $pdo->prepare("INSERT INTO budgets (user_id, total_budget, food_budget, transport_budget, shopping_budget, entertainment_budget, education_budget, health_budget, bills_budget, other_budget)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -92,7 +115,7 @@ switch ($action) {
                 health_budget = VALUES(health_budget),
                 bills_budget = VALUES(bills_budget),
                 other_budget = VALUES(other_budget)");
-        $stmt->execute([$user_id, $total, $food, $transport, $shopping, $entertainment, $education, $health, $bills, $other]);
+        $stmt->execute([$user_id, $values['total'], $values['food'], $values['transport'], $values['shopping'], $values['entertainment'], $values['education'], $values['health'], $values['bills'], $values['other']]);
 
         echo json_encode(['success' => true, 'message' => 'Budget saved']);
         break;

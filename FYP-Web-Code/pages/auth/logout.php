@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
 session_start();
 
 // 1. Unset all session variables

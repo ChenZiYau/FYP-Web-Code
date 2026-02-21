@@ -1,6 +1,8 @@
 <?php
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
 session_start();
-require_once 'db.php';
+require_once __DIR__ . '/../../includes/db.php';
 $isLoggedIn = isset($_SESSION['user_id']);
 $userName = $_SESSION['name'] ?? '';
 $userRole = $_SESSION['role'] ?? 'user';
@@ -22,9 +24,11 @@ function getContent($key, $default = '') {
     return htmlspecialchars($_siteContent[$key] ?? $default, ENT_QUOTES, 'UTF-8');
 }
 
+// getContentRaw: Only for emoji/special chars that are trusted defaults.
+// Still escapes HTML to prevent stored XSS from CMS injection.
 function getContentRaw($key, $default = '') {
     global $_siteContent;
-    return $_siteContent[$key] ?? $default;
+    return htmlspecialchars($_siteContent[$key] ?? $default, ENT_QUOTES, 'UTF-8');
 }
 ?>
 <!DOCTYPE html>
@@ -33,15 +37,104 @@ function getContentRaw($key, $default = '') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="OptiPlan - AI-powered productivity dashboard for students and young professionals. Manage schedules, studies, and budgets in one place.">
-    <title>OptiPlan - Your All-in-One Productivity Dashboard</title>
+    <title>OptiPlan — AI-Powered Productivity Dashboard for Students</title>
+    <meta name="description" content="OptiPlan unifies schedule management, study tracking, and budget planning into one AI-powered dashboard built for students and young professionals.">
+    <meta name="keywords" content="productivity dashboard, student planner, AI scheduling, budget tracker, study planner, OptiPlan">
+    <meta name="author" content="OptiPlan">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://optiplan.com/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="OptiPlan — AI-Powered Productivity Dashboard for Students">
+    <meta property="og:description" content="Stop switching between apps. OptiPlan unifies scheduling, study tracking, and budgeting into one intelligent platform for students.">
+    <meta property="og:url" content="https://optiplan.com/">
+    <meta property="og:site_name" content="OptiPlan">
+    <meta property="og:image" content="https://optiplan.com/assets/img/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="OptiPlan — AI-Powered Productivity Dashboard for Students">
+    <meta name="twitter:description" content="One dashboard for scheduling, studying, and budgeting. Built with AI for students and young professionals.">
+    <meta name="twitter:image" content="https://optiplan.com/assets/img/og-preview.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css">
-</head>
-<style>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Structured Data: WebApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "OptiPlan",
+        "url": "https://optiplan.com",
+        "description": "AI-powered productivity dashboard that unifies scheduling, study tracking, and budget management for students.",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+
+    <!-- Structured Data: FAQ -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What makes OptiPlan different from other productivity apps?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "OptiPlan is the only platform that integrates scheduling, study support, and budgeting into one unified dashboard. While other apps focus on just one area, OptiPlan connects all aspects of student life with AI-powered insights."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is OptiPlan free to use?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes! OptiPlan offers a free tier with core features. Premium features like advanced AI insights and unlimited integrations are available with a student subscription."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I sync OptiPlan with my university calendar?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Absolutely! OptiPlan supports calendar imports from most university systems and can automatically sync your class schedules, assignment deadlines, and exam dates."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does the AI-powered scheduling work?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Our AI learns from your behavior patterns and preferences to suggest optimal time slots for tasks, detect scheduling conflicts, and recommend breaks. The more you use OptiPlan, the smarter it becomes."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is my data secure?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes! We use industry-standard encryption to protect your data. Your information is private, never sold to third parties, and you can export or delete it at any time."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <style>
     /* Force dropdown icons to 18px regardless of external files */
     .user-dropdown .dropdown-item svg {
         width: 18px !important;
@@ -83,16 +176,17 @@ function getContentRaw($key, $default = '') {
         width: 18px !important;
         height: 18px !important;
     }
-</style>
+    </style>
+</head>
 
 <body>
     <!-- Fixed Header Navigation -->
     <header class="header" id="header">
-        <nav class="nav-container">
+        <nav class="nav-container" aria-label="Main navigation">
             <!-- Logo Section -->
             <div class="logo">
                 <a href="#top" class="logo-link">
-                    <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor" stroke-width="2"
                             stroke-linejoin="round" />
                         <circle cx="20" cy="20" r="6" fill="currentColor" />
@@ -145,8 +239,8 @@ function getContentRaw($key, $default = '') {
                     <!-- Logged In: User Menu with Dropdown -->
                     <div class="user-menu" id="userMenu">
                         <button class="user-menu-trigger" id="userMenuTrigger" type="button">
-                            <?php if ($userPfp && file_exists('../' . $userPfp)): ?>
-                                <img class="user-pfp" src="../<?php echo htmlspecialchars($userPfp); ?>" alt="Profile">
+                            <?php if ($userPfp && file_exists('../../' . $userPfp)): ?>
+                                <img class="user-pfp" src="../../<?php echo htmlspecialchars($userPfp); ?>" alt="<?php echo htmlspecialchars($userName); ?>'s profile picture" width="32" height="32">
                             <?php else: ?>
                                 <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -163,7 +257,7 @@ function getContentRaw($key, $default = '') {
                         </button>
 
                         <div class="user-dropdown" id="userDropdown">
-                            <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>"
+                            <a href="<?php echo ($userRole === 'admin') ? '../admin/admin.php' : '../dashboard/dashboard.php'; ?>"
                                 class="dropdown-item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="3" width="7" height="7"></rect>
@@ -172,7 +266,7 @@ function getContentRaw($key, $default = '') {
                                     <rect x="3" y="14" width="7" height="7"></rect>
                                 </svg>
                                 <span>Dashboard</span> </a>
-                            <a href="settings.php" class="dropdown-item">
+                            <a href="../settings/settings.php" class="dropdown-item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="12" r="3"></circle>
                                     <path
@@ -181,7 +275,7 @@ function getContentRaw($key, $default = '') {
                                 </svg>
                                 <span>Settings</span> </a>
                             <div class="dropdown-divider"></div>
-                            <a href="logout.php" class="dropdown-item logout">
+                            <a href="../auth/logout.php" class="dropdown-item logout">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                                     <polyline points="16 17 21 12 16 7"></polyline>
@@ -192,8 +286,8 @@ function getContentRaw($key, $default = '') {
                     </div>
                 <?php else: ?>
                     <!-- Not Logged In: Login/Signup Buttons -->
-                    <a href="login.php" class="btn-link">Log In</a>
-                    <a href="signup.php" class="btn-primary">Try Now</a>
+                    <a href="../auth/login.php" class="btn-link">Log In</a>
+                    <a href="../auth/signup.php" class="btn-primary">Try Now</a>
                 <?php endif; ?>
             </div>
 
@@ -226,10 +320,10 @@ function getContentRaw($key, $default = '') {
                     </p>
                     <div class="hero-actions">
                         <?php if ($isLoggedIn): ?>
-                            <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>"
+                            <a href="<?php echo ($userRole === 'admin') ? '../admin/admin.php' : '../dashboard/dashboard.php'; ?>"
                                 class="btn-hero-primary">Go to Dashboard</a>
                         <?php else: ?>
-                            <a href="signup.php" class="btn-hero-primary"><?php echo getContent('hero_cta_primary', 'Get Started Free'); ?></a>
+                            <a href="../auth/signup.php" class="btn-hero-primary"><?php echo getContent('hero_cta_primary', 'Get Started Free'); ?></a>
                         <?php endif; ?>
                         <a href="#tutorial" class="btn-hero-secondary">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -253,34 +347,34 @@ function getContentRaw($key, $default = '') {
                 </div>
                 <div class="hero-visual">
                     <div class="dashboard-preview">
-                        <div class="preview-card card-1">
-                            <div class="card-icon"><?php echo getContentRaw('hero_card1_icon', '📅'); ?></div>
+                        <article class="preview-card card-1">
+                            <div class="card-icon" aria-hidden="true"><?php echo getContentRaw('hero_card1_icon', '📅'); ?></div>
                             <div class="card-content">
-                                <h3><?php echo getContent('hero_card1_title', 'Smart Scheduling'); ?></h3>
+                                <p class="card-title"><?php echo getContent('hero_card1_title', 'Smart Scheduling'); ?></p>
                                 <p><?php echo getContent('hero_card1_desc', 'AI-optimized calendar'); ?></p>
                             </div>
-                        </div>
-                        <div class="preview-card card-2">
-                            <div class="card-icon"><?php echo getContentRaw('hero_card2_icon', '📚'); ?></div>
+                        </article>
+                        <article class="preview-card card-2">
+                            <div class="card-icon" aria-hidden="true"><?php echo getContentRaw('hero_card2_icon', '📚'); ?></div>
                             <div class="card-content">
-                                <h3><?php echo getContent('hero_card2_title', 'Study Notes'); ?></h3>
+                                <p class="card-title"><?php echo getContent('hero_card2_title', 'Study Notes'); ?></p>
                                 <p><?php echo getContent('hero_card2_desc', 'Personalized flip cards'); ?></p>
                             </div>
-                        </div>
-                        <div class="preview-card card-3">
-                            <div class="card-icon"><?php echo getContentRaw('hero_card3_icon', '💰'); ?></div>
+                        </article>
+                        <article class="preview-card card-3">
+                            <div class="card-icon" aria-hidden="true"><?php echo getContentRaw('hero_card3_icon', '💰'); ?></div>
                             <div class="card-content">
-                                <h3><?php echo getContent('hero_card3_title', 'Budget Tracking'); ?></h3>
+                                <p class="card-title"><?php echo getContent('hero_card3_title', 'Budget Tracking'); ?></p>
                                 <p><?php echo getContent('hero_card3_desc', 'Financial awareness'); ?></p>
                             </div>
-                        </div>
-                        <div class="preview-card card-4">
-                            <div class="card-icon"><?php echo getContentRaw('hero_card4_icon', '🔜'); ?></div>
+                        </article>
+                        <article class="preview-card card-4">
+                            <div class="card-icon" aria-hidden="true"><?php echo getContentRaw('hero_card4_icon', '🔜'); ?></div>
                             <div class="card-content">
-                                <h3><?php echo getContent('hero_card4_title', 'Many More'); ?></h3>
+                                <p class="card-title"><?php echo getContent('hero_card4_title', 'Many More'); ?></p>
                                 <p><?php echo getContent('hero_card4_desc', 'More updates to come...'); ?></p>
                             </div>
-                        </div>
+                        </article>
                     </div>
                 </div>
             </div>
@@ -294,21 +388,21 @@ function getContentRaw($key, $default = '') {
                     <h2 class="section-title"><?php echo getContent('problem_title', 'Fragmented Productivity is Killing Your Time'); ?></h2>
                 </div>
                 <div class="problem-grid">
-                    <div class="problem-card">
-                        <div class="problem-number"><?php echo getContent('problem_card1_number', '01'); ?></div>
+                    <article class="problem-card">
+                        <div class="problem-number" aria-hidden="true"><?php echo getContent('problem_card1_number', '01'); ?></div>
                         <h3><?php echo getContent('problem_card1_title', 'App Overload'); ?></h3>
                         <p><?php echo getContent('problem_card1_desc', 'Constantly switching between calendar apps, study tools, and budget trackers wastes valuable time and mental energy.'); ?></p>
-                    </div>
-                    <div class="problem-card">
-                        <div class="problem-number"><?php echo getContent('problem_card2_number', '02'); ?></div>
+                    </article>
+                    <article class="problem-card">
+                        <div class="problem-number" aria-hidden="true"><?php echo getContent('problem_card2_number', '02'); ?></div>
                         <h3><?php echo getContent('problem_card2_title', 'Missed Tasks'); ?></h3>
                         <p><?php echo getContent('problem_card2_desc', 'Important deadlines and activities fall through the cracks when scattered across multiple disconnected platforms.'); ?></p>
-                    </div>
-                    <div class="problem-card">
-                        <div class="problem-number"><?php echo getContent('problem_card3_number', '03'); ?></div>
+                    </article>
+                    <article class="problem-card">
+                        <div class="problem-number" aria-hidden="true"><?php echo getContent('problem_card3_number', '03'); ?></div>
                         <h3><?php echo getContent('problem_card3_title', 'No Integration'); ?></h3>
                         <p><?php echo getContent('problem_card3_desc', "Your schedule doesn't talk to your budget. Your study plan doesn't sync with your calendar. Everything exists in silos."); ?></p>
-                    </div>
+                    </article>
                 </div>
             </div>
         </section>
@@ -323,7 +417,7 @@ function getContentRaw($key, $default = '') {
                 </div>
                 <div class="features-grid">
                     <!-- Feature Card 1 -->
-                    <div class="feature-card flip-card">
+                    <article class="feature-card flip-card">
                         <div class="flip-card-inner">
                             <!-- Front -->
                             <div class="flip-card-front">
@@ -358,10 +452,10 @@ function getContentRaw($key, $default = '') {
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Feature Card 2 (Featured) -->
-                    <div class="feature-card featured flip-card">
+                    <article class="feature-card featured flip-card">
                         <div class="flip-card-inner">
                             <!-- Front -->
                             <div class="flip-card-front">
@@ -396,10 +490,10 @@ function getContentRaw($key, $default = '') {
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Feature Card 3 -->
-                    <div class="feature-card flip-card">
+                    <article class="feature-card flip-card">
                         <div class="flip-card-inner">
                             <!-- Front -->
                             <div class="flip-card-front">
@@ -433,7 +527,7 @@ function getContentRaw($key, $default = '') {
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </article>
                 </div>
             </div>
         </section>
@@ -574,8 +668,8 @@ function getContentRaw($key, $default = '') {
                         </div>
                         <!-- Video area -->
                         <div class="video-wrapper">
-                            <div class="video-placeholder">
-                                <svg class="play-icon" viewBox="0 0 80 80" fill="none">
+                            <div class="video-placeholder" role="button" aria-label="Play OptiPlan tutorial video" tabindex="0">
+                                <svg class="play-icon" viewBox="0 0 80 80" fill="none" aria-hidden="true">
                                     <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="2" />
                                     <path d="M32 26L54 40L32 54V26Z" fill="currentColor" />
                                 </svg>
@@ -672,6 +766,7 @@ function getContentRaw($key, $default = '') {
                 <div class="form-wrapper">
                     <?php if ($isLoggedIn): ?>
                     <form class="contact-form" id="feedbackForm" method="POST">
+                        <?php echo csrf_field(); ?>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="name">Name</label>
@@ -719,7 +814,7 @@ function getContentRaw($key, $default = '') {
                         </svg>
                         <h3 style="color:var(--white);font-size:1.25rem;margin-bottom:0.5rem;">Login Required</h3>
                         <p style="color:var(--gray-400);margin-bottom:1.5rem;">You need to be logged in to submit feedback.</p>
-                        <a href="login.php" class="btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 2rem;text-decoration:none;">
+                        <a href="../auth/login.php" class="btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 2rem;text-decoration:none;">
                             Sign In to Continue
                             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -739,7 +834,7 @@ function getContentRaw($key, $default = '') {
                     <h2 class="section-title"><?php echo getContent('testimonial_title', 'What Students Are Saying'); ?></h2>
                 </div>
                 <div class="feedback-grid">
-                    <div class="feedback-card">
+                    <article class="feedback-card">
                         <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
                         <p class="feedback-text">
                             "<?php echo getContent('testimonial1_text', 'OptiPlan changed how I manage my time. I went from constantly stressed to actually having free time. The budget tracker alone saved me hundreds this semester!'); ?>"
@@ -751,8 +846,8 @@ function getContentRaw($key, $default = '') {
                                 <div class="author-role"><?php echo getContent('testimonial1_role', 'Computer Science, Year 3'); ?></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="feedback-card">
+                    </article>
+                    <article class="feedback-card">
                         <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
                         <p class="feedback-text">
                             "<?php echo getContent('testimonial2_text', "Finally, an app that gets student life. The AI scheduling is scary accurate at predicting when I need breaks. My grades improved and I'm less stressed."); ?>"
@@ -764,8 +859,8 @@ function getContentRaw($key, $default = '') {
                                 <div class="author-role"><?php echo getContent('testimonial2_role', 'Business Admin, Year 2'); ?></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="feedback-card">
+                    </article>
+                    <article class="feedback-card">
                         <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
                         <p class="feedback-text">
                             "<?php echo getContent('testimonial3_text', 'I used to juggle 5 different apps. Now everything is in one place. The study planner helped me ace my finals, and the interface is actually beautiful.'); ?>"
@@ -777,7 +872,7 @@ function getContentRaw($key, $default = '') {
                                 <div class="author-role"><?php echo getContent('testimonial3_role', 'Psychology, Year 4'); ?></div>
                             </div>
                         </div>
-                    </div>
+                    </article>
                 </div>
             </div>
         </section>
@@ -798,7 +893,7 @@ function getContentRaw($key, $default = '') {
             </div>
         </section>
 
-        <!-- About Me Section -->
+        <!-- About OptiPlan Section -->
         <section class="section about-me-section" id="about-optiplan">
             <div class="container">
                 <div class="about-layout">
@@ -850,13 +945,15 @@ function getContentRaw($key, $default = '') {
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer class="footer">
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
             <div class="footer-container">
                 <div class="footer-main">
                     <div class="footer-brand">
                         <div class="footer-logo">
-                            <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor"
                                     stroke-width="2" stroke-linejoin="round" />
                                 <circle cx="20" cy="20" r="6" fill="currentColor" />
@@ -867,7 +964,7 @@ function getContentRaw($key, $default = '') {
                     </div>
                     <div class="footer-links">
                         <div class="footer-column">
-                            <h4>Product</h4>
+                            <h3>Product</h3>
                             <ul>
                                 <li><a href="#about-optiplan">About OptiPlan</a></li>
                                 <li><a href="#tutorial">Tutorial</a></li>
@@ -876,7 +973,7 @@ function getContentRaw($key, $default = '') {
                             </ul>
                         </div>
                         <div class="footer-column">
-                            <h4>Resources</h4>
+                            <h3>Resources</h3>
                             <ul>
                                 <li><a href="#about-me">About Creator</a></li>
                                 <li><a href="#">Documentation</a></li>
@@ -885,7 +982,7 @@ function getContentRaw($key, $default = '') {
                             </ul>
                         </div>
                         <div class="footer-column">
-                            <h4>Legal</h4>
+                            <h3>Legal</h3>
                             <ul>
                                 <li><a href="#">Privacy Policy</a></li>
                                 <li><a href="#">Terms of Service</a></li>
@@ -895,7 +992,7 @@ function getContentRaw($key, $default = '') {
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p class="footer-copyright"><?php echo getContentRaw('footer_copyright', '&copy; 2026 OptiPlan. All rights reserved.'); ?></p>
+                    <p class="footer-copyright"><?php echo getContent('footer_copyright', '© 2026 OptiPlan. All rights reserved.'); ?></p>
                     <div class="footer-social">
                         <a href="#" aria-label="Twitter">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -920,7 +1017,7 @@ function getContentRaw($key, $default = '') {
             </div>
         </footer>
 
-        <script src="../../JavaScript/script.js"></script>
+        <script src="script.js"></script>
 
         <!-- Feedback Form AJAX Submit -->
         <script>
@@ -935,7 +1032,7 @@ function getContentRaw($key, $default = '') {
                 btn.disabled = true;
                 btn.innerHTML = 'Sending...';
 
-                fetch('submit_feedback.php', {
+                fetch('../../api/submit_feedback.php', {
                     method: 'POST',
                     body: new FormData(form)
                 })
@@ -947,7 +1044,7 @@ function getContentRaw($key, $default = '') {
                         setTimeout(function() { btn.innerHTML = origText; btn.disabled = false; }, 2500);
                     } else {
                         if (data.require_login) {
-                            window.location.href = 'login.php';
+                            window.location.href = '../auth/login.php';
                         } else {
                             alert(data.message || 'Something went wrong.');
                         }

@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Dashboard.js has loaded successfully!");
 
     // --- 1. CONFIGURATION ---
-    const API_KEY = 'AIzaSyBy-yBgSizYEoy3QL6zoV9qHI0rSEfSAw0'; 
-    const CALENDAR_ID = 'kucingcomel56789@gmail.com'; 
+    // API key moved to server-side proxy (calendar_proxy.php) for security.
+    // No secrets are exposed to the client.
 
     // --- 2. SIDEBAR & MODAL LOGIC ---
     const sidebar = document.getElementById('sidebar');
@@ -70,8 +70,10 @@ document.addEventListener('DOMContentLoaded', function() {
         createForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(createForm);
-            
-            fetch('save_task.php', {
+            // Include CSRF token for security
+            if (window.CSRF_TOKEN) formData.append('csrf_token', window.CSRF_TOKEN);
+
+            fetch('../../api/save_task.php', {
                 method: 'POST',
                 body: formData
             })
@@ -121,9 +123,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const timeMin = new Date(currentYear, currentMonth, 1).toISOString();
             const timeMax = new Date(currentYear, currentMonth + 1, 0).toISOString();
-            const googleUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true`;
-            
-            const localUrl = `get_events.php?month=${currentMonth + 1}&year=${currentYear}`;
+            // Google Calendar requests go through server-side proxy (API key stays on server)
+            const googleUrl = `../../api/calendar_proxy.php?timeMin=${encodeURIComponent(timeMin)}&timeMax=${encodeURIComponent(timeMax)}`;
+
+            const localUrl = `../../api/get_events.php?month=${currentMonth + 1}&year=${currentYear}`;
 
             try {
                 const [googleRes, localRes] = await Promise.allSettled([fetch(googleUrl), fetch(localUrl)]);
@@ -376,10 +379,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // --- 5. COMPLETE TASK LOGIC (Global) ---
 window.completeTask = function(taskId) {
-    fetch('update_task.php', {
+    fetch('../../api/update_task.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: taskId, status: 'completed' })
+        body: JSON.stringify({ id: taskId, status: 'completed', csrf_token: window.CSRF_TOKEN || '' })
     })
     .then(response => response.json())
     .then(data => {

@@ -1,0 +1,14 @@
+# Environment files (contain secrets)
+.env
+
+# Uploaded files
+FYP-Web-Code/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp

@@ -542,7 +542,7 @@ function saveCmsField(key, btn) {
     fetch('api_content.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: key, value: value })
+        body: JSON.stringify({ key: key, value: value, csrf_token: window.CSRF_TOKEN || '' })
     })
     .then(r => r.json())
     .then(data => {
@@ -565,7 +565,7 @@ function saveCmsField(key, btn) {
 function resetAllContent() {
     if (!confirm('Reset ALL website content to defaults? This cannot be undone.')) return;
 
-    fetch('api_content.php', { method: 'DELETE' })
+    fetch('api_content.php', { method: 'DELETE', headers: { 'X-CSRF-Token': window.CSRF_TOKEN || '' } })
     .then(r => r.json())
     .then(data => {
         if (data.success) {

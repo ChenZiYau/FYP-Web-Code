@@ -5,7 +5,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    const API_URL = '../php/finance_api.php';
+    const API_URL = '../finance/finance_api.php';
 
     // ==========================================
     // EXPENSE DATA MANAGEMENT
@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 const formData = new FormData();
                 formData.append('action', 'add_expense');
+                if (window.CSRF_TOKEN) formData.append('csrf_token', window.CSRF_TOKEN);
                 formData.append('amount', expense.amount);
                 formData.append('category', expense.category);
                 formData.append('description', expense.description || '');
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 const formData = new FormData();
                 formData.append('action', 'delete_expense');
+                if (window.CSRF_TOKEN) formData.append('csrf_token', window.CSRF_TOKEN);
                 formData.append('id', id);
 
                 const res = await fetch(API_URL, { method: 'POST', body: formData });
@@ -107,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.budget = { ...this.budget, ...budgetData };
                 const formData = new FormData();
                 formData.append('action', 'save_budget');
+                if (window.CSRF_TOKEN) formData.append('csrf_token', window.CSRF_TOKEN);
                 formData.append('total', this.budget.total);
                 formData.append('food', this.budget.food);
                 formData.append('transport', this.budget.transport);

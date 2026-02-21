@@ -1,8 +1,11 @@
 <?php
-$host = 'localhost';
-$user = 'root';
-$pass = ''; // Default for XAMPP
-$dbname = 'optiplan_db';
+require_once __DIR__ . '/env_loader.php';
+load_env();
+
+$host   = env('DB_HOST', 'localhost');
+$user   = env('DB_USER', 'root');
+$pass   = env('DB_PASS', '');
+$dbname = env('DB_NAME', 'optiplan_db');
 
 try {
     // 1. Connect to MySQL
@@ -11,9 +14,9 @@ try {
 
     // 2. Create DB if missing
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4");
-    
+
     // 3. Select the DB
-    $pdo->exec("USE `$dbname`"); 
+    $pdo->exec("USE `$dbname`");
 
     // 4. Create Users Table (Updated with level & xp)
     $userSql = "CREATE TABLE IF NOT EXISTS users (
@@ -25,13 +28,13 @@ try {
         role ENUM('user', 'admin') DEFAULT 'user',
         last_login DATE NULL,
         streak_count INT DEFAULT 0,
-        level INT DEFAULT 1,      /* Added this */
-        xp INT DEFAULT 0,         /* Added this */
+        level INT DEFAULT 1,
+        xp INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     $pdo->exec($userSql);
 
-    // 5. Create Tasks Table (New!)
+    // 5. Create Tasks Table
     $taskSql = "CREATE TABLE IF NOT EXISTS tasks (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
@@ -85,7 +88,7 @@ try {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )");
 
-    // 9. Feedback table (landing page contact form — no login required)
+    // 9. Feedback table (landing page contact form)
     $pdo->exec("CREATE TABLE IF NOT EXISTS feedback (
         id         INT AUTO_INCREMENT PRIMARY KEY,
         name       VARCHAR(100),
@@ -218,20 +221,19 @@ try {
         }
     }
 
-    // 12. Auto-create Admin if missing
+    // 12. Auto-create Admin if missing (password from env, not hardcoded)
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = 'admin@optiplan.com'");
     $stmt->execute();
     if (!$stmt->fetch()) {
-        $adminPass = password_hash('12345', PASSWORD_BCRYPT);
-        $sql = "INSERT INTO users (first_name, last_name, email, password_hash, role, streak_count) 
+        $adminPass = password_hash(env('ADMIN_SEED_PASSWORD', 'change-me-immediately'), PASSWORD_BCRYPT);
+        $sql = "INSERT INTO users (first_name, last_name, email, password_hash, role, streak_count)
                 VALUES ('System', 'Admin', 'admin@optiplan.com', ?, 'admin', 0)";
         $pdo->prepare($sql)->execute([$adminPass]);
-        // echo "Admin account created successfully.<br>";  <-- DELETE OR COMMENT THIS
     }
 
-    // echo "Database setup completed successfully!";      <-- DELETE OR COMMENT THIS
-
 } catch (PDOException $e) {
-    die(json_encode(['success' => false, 'message' => 'Database Config Error: ' . $e->getMessage()]));
+    // Never expose raw DB errors to the client
+    error_log('OptiPlan DB Error: ' . $e->getMessage());
+    die(json_encode(['success' => false, 'message' => 'A database error occurred. Please try again later.']));
 }
 ?>

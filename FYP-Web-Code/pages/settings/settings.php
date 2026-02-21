@@ -1,9 +1,11 @@
 <?php
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
 session_start();
-require_once 'db.php';
+require_once __DIR__ . '/../../includes/db.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: ../auth/login.php');
     exit;
 }
 
@@ -28,14 +30,14 @@ $email = $user['email'];
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../css/settings.css">
+    <link rel="stylesheet" href="../dashboard/dashboard.css">
+    <link rel="stylesheet" href="settings.css">
 </head>
 <body class="dashboard-body">
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="dashboard.php" class="sidebar-logo">
+            <a href="../dashboard/dashboard.php" class="sidebar-logo">
                 <svg class="sidebar-logo-icon" viewBox="0 0 40 40" fill="none">
                     <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
                     <circle cx="20" cy="20" r="6" fill="currentColor" />
@@ -50,7 +52,7 @@ $email = $user['email'];
         </div>
 
         <nav class="sidebar-nav">
-            <a href="dashboard.php" class="nav-item">
+            <a href="../dashboard/dashboard.php" class="nav-item">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
@@ -67,7 +69,7 @@ $email = $user['email'];
         </nav>
 
         <div class="sidebar-footer">
-            <a href="logout.php" class="nav-item logout-btn">
+            <a href="../auth/logout.php" class="nav-item logout-btn">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -100,8 +102,8 @@ $email = $user['email'];
                 <div class="settings-card-body">
                     <div class="pfp-upload-area">
                         <div class="pfp-preview" id="pfpPreview">
-                            <?php if ($currentPfp && file_exists('../' . $currentPfp)): ?>
-                                <img src="../<?php echo htmlspecialchars($currentPfp); ?>" alt="Profile" id="pfpImage">
+                            <?php if ($currentPfp && file_exists('../../' . $currentPfp)): ?>
+                                <img src="../../<?php echo htmlspecialchars($currentPfp); ?>" alt="Profile" id="pfpImage">
                             <?php else: ?>
                                 <span class="pfp-initials" id="pfpInitials"><?php echo strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1)); ?></span>
                             <?php endif; ?>
@@ -226,6 +228,7 @@ $email = $user['email'];
             setBtnLoading(uploadBtn, true);
             var fd = new FormData();
             fd.append('pfp', file);
+            fd.append('csrf_token', <?php echo json_encode(csrf_token()); ?>);
 
             fetch('api_settings.php?action=upload_pfp', { method: 'POST', body: fd })
             .then(function(r) { return r.json(); })
@@ -238,7 +241,7 @@ $email = $user['email'];
                     fileNameEl.textContent = '';
                     // Update preview with server path
                     var img = document.getElementById('pfpImage');
-                    if (img) img.src = '../' + data.pfp_path + '?t=' + Date.now();
+                    if (img) img.src = '../../' + data.pfp_path + '?t=' + Date.now();
                 } else {
                     showMsg(msgEl, data.message, 'error');
                 }
@@ -270,6 +273,7 @@ $email = $user['email'];
             setBtnLoading(btn, true);
             var fd = new FormData();
             fd.append('username', username);
+            fd.append('csrf_token', <?php echo json_encode(csrf_token()); ?>);
 
             fetch('api_settings.php?action=update_username', { method: 'POST', body: fd })
             .then(function(r) { return r.json(); })

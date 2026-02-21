@@ -1,10 +1,12 @@
 <?php
-require_once 'db.php';
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
 session_start();
+require_once __DIR__ . '/../../includes/db.php';
 
 // 1. Secure the page
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: login.php');
+    header('Location: ../auth/login.php');
     exit;
 }
 
@@ -78,7 +80,7 @@ try {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
     <div class="admin-layout">
@@ -86,7 +88,7 @@ try {
         <aside class="sidebar" id="sidebar">
             <!-- Sidebar Header -->
             <div class="sidebar-header">
-                <a href="index.php" class="sidebar-logo">
+                <a href="../landing/index.php" class="sidebar-logo">
                     <svg class="sidebar-logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
@@ -133,7 +135,7 @@ try {
 
             <!-- Sidebar Footer -->
             <div class="sidebar-footer">
-                <a href="logout.php" class="admin-profile" onclick="handleLogout(event)">
+                <a href="../auth/logout.php" class="admin-profile" onclick="handleLogout(event)">
                     <div class="admin-avatar">AD</div>
                     <div class="admin-info">
                         <div class="admin-name">Admin User</div>
@@ -297,6 +299,7 @@ try {
         </main>
     </div>
 
-    <script src="../JavaScript/admin.js"></script>
+    <script>window.CSRF_TOKEN = <?php echo json_encode(csrf_token()); ?>;</script>
+    <script src="admin.js"></script>
 </body>
 </html>

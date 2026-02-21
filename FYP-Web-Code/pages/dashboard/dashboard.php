@@ -1,12 +1,12 @@
 <?php
 // --- TOP OF FILE: Database & Logic ---
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
 session_start();
+require_once __DIR__ . '/../../includes/db.php';
 
-// Ensure db.php exists in the same directory
-require 'db.php'; 
-
-// 1. Get User ID (Default to 1 for testing if session not set)
-$user_id = $_SESSION['user_id'] ?? 1;
+// SECURITY: Require authentication (was defaulting to user_id 1)
+$user_id = require_auth();
 $user_name = $_SESSION['name'] ?? 'User';
 $today = date('Y-m-d');
 
@@ -76,14 +76,14 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="dashboard.css">
     
 </head>
 <body class="dashboard-body">
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="index.php" class="sidebar-logo">
+            <a href="../landing/index.php" class="sidebar-logo">
                 <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
@@ -125,7 +125,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                 <span class="nav-text">Schedules</span>
             </a>
             
-            <a href="finance.php" class="nav-item">
+            <a href="../finance/finance.php" class="nav-item">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -148,7 +148,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
         </nav>
 
         <div class="sidebar-footer">
-            <a href="logout.php" class="nav-item logout-btn">
+            <a href="../auth/logout.php" class="nav-item logout-btn">
                 <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -180,7 +180,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
                     </div>
                 </div>
 
-                <a href="settings.php" class="settings-btn" id="settingsBtn">
+                <a href="../settings/settings.php" class="settings-btn" id="settingsBtn">
                     <svg class="settings-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -285,7 +285,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
             <section class="finance-section">
                 <div class="section-header">
                     <h2 class="section-title">Finance</h2>
-                    <a href="finance.php" class="view-all-link">View All →</a>
+                    <a href="../finance/finance.php" class="view-all-link">View All →</a>
                 </div>
                 <div class="finance-widget">
                     <div class="finance-stats-col">
@@ -466,6 +466,8 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
         </div>
     </div>
 
-    <script src="../../JavaScript/dashboard.js"></script>
-    <script src="../../JavaScript/finance.js"></script>
+    <!-- CSRF token for AJAX requests -->
+    <script>window.CSRF_TOKEN = <?php echo json_encode(csrf_token()); ?>;</script>
+    <script src="dashboard.js"></script>
+    <script src="../finance/finance.js"></script>
 </body>

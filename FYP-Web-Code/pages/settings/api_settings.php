@@ -1,19 +1,23 @@
 <?php
+require_once __DIR__ . '/../../includes/security.php';
+configure_secure_session();
 session_start();
-require_once 'db.php';
+require_once __DIR__ . '/../../includes/db.php';
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Not authenticated.']);
-    exit;
-}
+$userId = require_auth();
 
-$userId = $_SESSION['user_id'];
+// Rate limit: 20 settings changes per 15 minutes
+enforce_rate_limit($pdo, 'api_settings', 20, 900);
+
 $action = $_GET['action'] ?? '';
 
 // ── Update Username ──
 if ($action === 'update_username' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
+    csrf_enforce();
+
+    $input = filter_input_fields(['username', 'csrf_token']);
+    $username = trim($input['username'] ?? '');
 
     if ($username === '' || !preg_match('/^[a-zA-Z0-9_]{3,50}$/', $username)) {
         echo json_encode(['success' => false, 'message' => 'Username must be 3-50 characters: letters, numbers, or underscores.']);
@@ -38,6 +42,8 @@ if ($action === 'update_username' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ── Upload Profile Picture ──
 if ($action === 'upload_pfp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_enforce();
+
     if (!isset($_FILES['pfp']) || $_FILES['pfp']['error'] !== UPLOAD_ERR_OK) {
         echo json_encode(['success' => false, 'message' => 'No file uploaded or upload error.']);
         exit;
@@ -45,7 +51,7 @@ if ($action === 'upload_pfp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $file = $_FILES['pfp'];
 
-    // Validate type
+    // Validate MIME type using file contents (not user-supplied type)
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($file['tmp_name']);
     $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png'];
@@ -61,7 +67,7 @@ if ($action === 'upload_pfp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Create upload dir
-    $uploadDir = '../uploads/pfps/';
+    $uploadDir = '../../uploads/pfps/';
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);
     }
@@ -74,9 +80,9 @@ if ($action === 'upload_pfp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         unlink('../' . $oldPath);
     }
 
-    // Save new file
+    // Save new file with a safe, non-guessable filename
     $ext = $allowed[$mime];
-    $filename = 'pfp_' . $userId . '_' . time() . '.' . $ext;
+    $filename = 'pfp_' . $userId . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
     $relativePath = 'uploads/pfps/' . $filename;
     $fullPath = $uploadDir . $filename;
 

@@ -21,50 +21,57 @@ OptiPlan is a full-stack web application designed for students and young profess
 ```
 FYP/
 ├── FYP-Web-Code/
-│   ├── php/           # Server-side pages and logic
-│   ├── css/           # Stylesheets
-│   └── img/           # Brand assets
-├── JavaScript/        # Client-side scripts
+│   ├── pages/
+│   │   ├── landing/      # index.php + styles.css + script.js
+│   │   ├── auth/          # login.php, signup.php, logout.php + auth.css
+│   │   ├── dashboard/     # dashboard.php + dashboard.css + dashboard.js
+│   │   ├── finance/       # finance.php, finance_api.php + finance.css + finance.js
+│   │   ├── admin/         # admin.php, adminuserdb.php, adminfeedback.php, api_content.php + admin.css + admin.js
+│   │   └── settings/      # settings.php, api_settings.php + settings.css
+│   ├── includes/          # db.php, security.php, env_loader.php
+│   ├── api/               # save_task.php, update_task.php, get_events.php, submit_feedback.php, calendar_proxy.php
+│   ├── assets/img/        # Brand assets (logos)
+│   └── uploads/pfps/      # User profile picture uploads
 └── CLAUDE.md
 ```
 
 ## Key Directories
 
-### `/FYP-Web-Code/php/`
-Server-side PHP files handling routing, authentication, and page rendering.
+### `/FYP-Web-Code/pages/`
+Page-grouped folders — each page's PHP, CSS, and JS live together.
+
+| Folder | Files | Purpose |
+|--------|-------|---------|
+| `landing/` | `index.php`, `styles.css`, `script.js` | Landing page with hero, features, FAQ, feedback form |
+| `auth/` | `login.php`, `signup.php`, `logout.php`, `auth.css` | Authentication and registration |
+| `dashboard/` | `dashboard.php`, `dashboard.css`, `dashboard.js` | Main user dashboard (tasks, calendar, chatbot) |
+| `finance/` | `finance.php`, `finance_api.php`, `finance.css`, `finance.js` | Budget management |
+| `admin/` | `admin.php`, `adminuserdb.php`, `adminfeedback.php`, `api_content.php`, `admin.css`, `admin.js` | Admin panel |
+| `settings/` | `settings.php`, `api_settings.php`, `settings.css` | User settings and profile |
+
+### `/FYP-Web-Code/includes/`
+Shared server-side utilities.
 
 | File | Purpose |
 |------|---------|
-| `index.php` | Landing page with hero, features, FAQ, feedback form |
-| `dashboard.php` | Main user dashboard (tasks, calendar, finance, chatbot) |
-| `admin.php` | Admin panel (user management, feedback monitoring) |
-| `login.php` | Authentication with AJAX form handling |
-| `signup.php` | User registration with validation |
-| `logout.php` | Session destruction |
 | `db.php` | Database connection, auto-creates schema and seeds admin |
+| `security.php` | CSRF protection, session configuration, auth helpers |
+| `env_loader.php` | Loads `.env` file for configuration |
 
-### `/FYP-Web-Code/css/`
-Stylesheets using CSS custom properties for theming.
-
-| File | Purpose |
-|------|---------|
-| `styles.css` | Landing page design system (1522 lines) |
-| `dashboard.css` | Dashboard layout and components |
-| `admin.css` | Admin panel tables and statistics |
-| `auth.css` | Login/signup form styling |
-
-### `/JavaScript/`
-Client-side interactivity without frameworks.
+### `/FYP-Web-Code/api/`
+Stateless API endpoints returning JSON.
 
 | File | Purpose |
 |------|---------|
-| `script.js` | Landing page: scroll effects, nav dropdowns, mobile menu |
-| `dashboard.js` | Sidebar toggle, calendar, modals, keyboard shortcuts |
-| `admin.js` | Section switching, search, user management functions |
+| `save_task.php` | Create new tasks |
+| `update_task.php` | Update existing tasks |
+| `get_events.php` | Fetch calendar events |
+| `submit_feedback.php` | Submit feedback from landing page |
+| `calendar_proxy.php` | Server-side proxy for Google Calendar API |
 
 ## Database Schema
 
-Auto-created by `db.php:10-27` on first run:
+Auto-created by `db.php` on first run:
 
 ```sql
 users (
@@ -86,7 +93,7 @@ Default admin seeded: `admin@optiplan.com` / `12345`
 
 ### Running Locally
 1. Start XAMPP (Apache + MySQL)
-2. Access: `http://localhost/FYP/FYP-Web-Code/php/index.php`
+2. Access: `http://localhost/FYP/FYP-Web-Code/pages/landing/index.php`
 3. Database auto-creates `optiplan_db` on first page load
 
 ### Database Access
@@ -97,30 +104,32 @@ Default admin seeded: `admin@optiplan.com` / `12345`
 
 | URL Path | Purpose | Auth Required |
 |----------|---------|---------------|
-| `/php/index.php` | Public landing page | No |
-| `/php/login.php` | User login | No |
-| `/php/signup.php` | Registration | No |
-| `/php/dashboard.php` | User dashboard | Yes (user role) |
-| `/php/admin.php` | Admin panel | Yes (admin role) |
+| `/pages/landing/index.php` | Public landing page | No |
+| `/pages/auth/login.php` | User login | No |
+| `/pages/auth/signup.php` | Registration | No |
+| `/pages/dashboard/dashboard.php` | User dashboard | Yes (user role) |
+| `/pages/admin/admin.php` | Admin panel | Yes (admin role) |
+| `/pages/finance/finance.php` | Finance tracker | Yes (user role) |
+| `/pages/settings/settings.php` | User settings | Yes (user role) |
 
 ## User Roles
 
 - **user** (default): Access to dashboard features
 - **admin**: Access to admin panel + user management
 
-Role-based redirect implemented in `login.php:24`
+Role-based redirect implemented in `pages/auth/login.php`
 
 ## Authentication Flow
 
-1. User submits credentials via AJAX (`login.php:177-195`)
-2. Server validates with bcrypt (`login.php:17`)
-3. Session created with user_id, role, name (`login.php:18-21`)
-4. JSON response triggers redirect (`login.php:26-28`)
-5. Protected pages check `$_SESSION['user_id']` (`dashboard.php:3-10`, `admin.php:5-8`)
+1. User submits credentials via AJAX (`pages/auth/login.php`)
+2. Server validates with bcrypt
+3. Session created with user_id, role, name
+4. JSON response triggers redirect
+5. Protected pages check `$_SESSION['user_id']`
 
 ## Design System
 
-CSS custom properties defined in `styles.css:1-50`:
+CSS custom properties defined in `pages/landing/styles.css`:
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -131,10 +140,21 @@ CSS custom properties defined in `styles.css:1-50`:
 
 ## Key Implementation Details
 
-- **Password hashing**: BCRYPT via `password_hash()` (`signup.php:278`, `db.php:34`)
-- **SQL injection prevention**: PDO prepared statements (`login.php:13-14`)
-- **State persistence**: localStorage for sidebar state (`dashboard.js:18`)
-- **AJAX pattern**: FormData + fetch with JSON responses (`login.php:181-194`)
+- **Password hashing**: BCRYPT via `password_hash()`
+- **SQL injection prevention**: PDO prepared statements throughout
+- **State persistence**: localStorage for sidebar state (`dashboard.js`)
+- **AJAX pattern**: FormData + fetch with JSON responses
+- **PHP includes**: All pages use `require_once __DIR__ . '/../../includes/...'` for absolute paths
+- **API endpoints**: API files use `require_once __DIR__ . '/../includes/...'`
+
+## Path Conventions
+
+- Page PHP files include shared code via: `require_once __DIR__ . '/../../includes/db.php'`
+- API PHP files include shared code via: `require_once __DIR__ . '/../includes/db.php'`
+- CSS/JS are co-located with their page PHP files
+- Cross-page CSS references use `../folder/file.css` (e.g., `../dashboard/dashboard.css`)
+- JS fetch URLs to API: `../../api/endpoint.php` (from pages/*/)
+- Navigation links between pages: `../folder/page.php`
 
 ## Additional Documentation
 

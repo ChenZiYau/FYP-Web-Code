@@ -1,8 +1,31 @@
 <?php
 session_start();
+require_once 'db.php';
 $isLoggedIn = isset($_SESSION['user_id']);
 $userName = $_SESSION['name'] ?? '';
 $userRole = $_SESSION['role'] ?? 'user';
+$userPfp = $_SESSION['pfp_path'] ?? '';
+
+// Load site content from DB
+$_siteContent = [];
+try {
+    $stmt = $pdo->query("SELECT section_key, content_value FROM site_content");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $_siteContent[$row['section_key']] = $row['content_value'];
+    }
+} catch (PDOException $e) {
+    // Silently fail — defaults will be used
+}
+
+function getContent($key, $default = '') {
+    global $_siteContent;
+    return htmlspecialchars($_siteContent[$key] ?? $default, ENT_QUOTES, 'UTF-8');
+}
+
+function getContentRaw($key, $default = '') {
+    global $_siteContent;
+    return $_siteContent[$key] ?? $default;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -78,35 +101,41 @@ $userRole = $_SESSION['role'] ?? 'user';
                 </a>
             </div>
 
-            <!-- Center Navigation Links -->
+            <!-- Center Navigation — 3 items -->
             <ul class="nav-links">
+                <!-- 1. Explore dropdown -->
                 <li class="nav-item dropdown">
                     <button class="nav-link dropdown-trigger" aria-expanded="false" aria-haspopup="true">
-                        About
+                        Explore
                         <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
-                            <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round" />
+                            <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="#about-me" class="dropdown-link">About Me</a></li>
-                        <li><a href="#about-optiplan" class="dropdown-link">About OptiPlan</a></li>
+                        <li><a href="#problem" class="dropdown-link">The Problems</a></li>
+                        <li><a href="#features" class="dropdown-link">Features</a></li>
+                        <li><a href="#roadmap" class="dropdown-link">Roadmap</a></li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a href="#problem" class="nav-link">The Problems</a>
+
+                <!-- 2. Support dropdown -->
+                <li class="nav-item dropdown">
+                    <button class="nav-link dropdown-trigger" aria-expanded="false" aria-haspopup="true">
+                        Support
+                        <svg class="dropdown-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#tutorial" class="dropdown-link">Tutorial Video</a></li>
+                        <li><a href="#faq" class="dropdown-link">FAQ</a></li>
+                        <li><a href="#form" class="dropdown-link">Feedback Form</a></li>
+                    </ul>
                 </li>
+
+                <!-- 3. About — direct link -->
                 <li class="nav-item">
-                    <a href="#features" class="nav-link">Features</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#tutorial" class="nav-link">Tutorial Video</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#faq" class="nav-link">FAQ</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#form" class="nav-link">Feedback Form</a>
+                    <a href="#about-optiplan" class="nav-link">About</a>
                 </li>
             </ul>
 
@@ -116,10 +145,14 @@ $userRole = $_SESSION['role'] ?? 'user';
                     <!-- Logged In: User Menu with Dropdown -->
                     <div class="user-menu" id="userMenu">
                         <button class="user-menu-trigger" id="userMenuTrigger" type="button">
-                            <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
+                            <?php if ($userPfp && file_exists('../' . $userPfp)): ?>
+                                <img class="user-pfp" src="../<?php echo htmlspecialchars($userPfp); ?>" alt="Profile">
+                            <?php else: ?>
+                                <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            <?php endif; ?>
 
                             <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
 
@@ -139,8 +172,7 @@ $userRole = $_SESSION['role'] ?? 'user';
                                     <rect x="3" y="14" width="7" height="7"></rect>
                                 </svg>
                                 <span>Dashboard</span> </a>
-                            <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>#settings"
-                                class="dropdown-item">
+                            <a href="settings.php" class="dropdown-item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="12" r="3"></circle>
                                     <path
@@ -181,143 +213,72 @@ $userRole = $_SESSION['role'] ?? 'user';
             <div class="hero-shader-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,0.35),transparent 50%,rgba(0,0,0,0.2));"></div>
             <div class="hero-content" style="position:relative;z-index:2;">
                 <div class="hero-text">
-                    <span class="hero-badge">AI-Powered Productivity</span>
+                    <span class="hero-badge"><?php echo getContent('hero_badge', 'AI-Powered Productivity'); ?></span>
                     <h1 class="hero-title">
-                        One Dashboard.<br>
+                        <?php echo getContent('hero_title_line1', 'One Dashboard.'); ?><br>
                         <span class="cycling-wrapper">
                             <span class="cycling-text gradient-text" id="cyclingText">Everything</span>
                         </span><br>
-                        Organized.
+                        <?php echo getContent('hero_title_line2', 'Organized.'); ?>
                     </h1>
                     <p class="hero-description">
-                        Stop switching between different applications. Optiplan unifies your schedule, studies and budgeting into one singular intelligent platform, designed speifically for students and young interns.
+                        <?php echo getContent('hero_description', 'Stop switching between different applications. Optiplan unifies your schedule, studies and budgeting into one singular intelligent platform, designed speifically for students and young interns.'); ?>
                     </p>
                     <div class="hero-actions">
                         <?php if ($isLoggedIn): ?>
                             <a href="<?php echo ($userRole === 'admin') ? 'admin.php' : 'dashboard.php'; ?>"
                                 class="btn-hero-primary">Go to Dashboard</a>
                         <?php else: ?>
-                            <a href="signup.php" class="btn-hero-primary">Get Started Free</a>
+                            <a href="signup.php" class="btn-hero-primary"><?php echo getContent('hero_cta_primary', 'Get Started Free'); ?></a>
                         <?php endif; ?>
                         <a href="#tutorial" class="btn-hero-secondary">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5" />
                                 <path d="M8 6L14 10L8 14V6Z" fill="currentColor" />
                             </svg>
-                            Watch Demo
+                            <?php echo getContent('hero_cta_secondary', 'Watch Demo'); ?>
                         </a>
                     </div>
                     <div class="hero-stats">
                         <div class="stat-item">
-                            <span class="stat-number">75%+</span>
-                            <span class="stat-label">Students use 3+ apps daily</span>
+                            <span class="stat-number"><?php echo getContent('hero_stat1_number', '75%+'); ?></span>
+                            <span class="stat-label"><?php echo getContent('hero_stat1_label', 'Students use 3+ apps daily'); ?></span>
                         </div>
                         <div class="stat-divider"></div>
                         <div class="stat-item">
-                            <span class="stat-number">1</span>
-                            <span class="stat-label">Platform solves it all</span>
+                            <span class="stat-number"><?php echo getContent('hero_stat2_number', '1'); ?></span>
+                            <span class="stat-label"><?php echo getContent('hero_stat2_label', 'Platform solves it all'); ?></span>
                         </div>
                     </div>
                 </div>
                 <div class="hero-visual">
                     <div class="dashboard-preview">
                         <div class="preview-card card-1">
-                            <div class="card-icon">📅</div>
+                            <div class="card-icon"><?php echo getContentRaw('hero_card1_icon', '📅'); ?></div>
                             <div class="card-content">
-                                <h3>Smart Scheduling</h3>
-                                <p>AI-optimized calendar</p>
+                                <h3><?php echo getContent('hero_card1_title', 'Smart Scheduling'); ?></h3>
+                                <p><?php echo getContent('hero_card1_desc', 'AI-optimized calendar'); ?></p>
                             </div>
                         </div>
                         <div class="preview-card card-2">
-                            <div class="card-icon">📚</div>
+                            <div class="card-icon"><?php echo getContentRaw('hero_card2_icon', '📚'); ?></div>
                             <div class="card-content">
-                                <h3>Study Notes</h3>
-                                <p>Personalized flip cards</p>
+                                <h3><?php echo getContent('hero_card2_title', 'Study Notes'); ?></h3>
+                                <p><?php echo getContent('hero_card2_desc', 'Personalized flip cards'); ?></p>
                             </div>
                         </div>
                         <div class="preview-card card-3">
-                            <div class="card-icon">💰</div>
+                            <div class="card-icon"><?php echo getContentRaw('hero_card3_icon', '💰'); ?></div>
                             <div class="card-content">
-                                <h3>Budget Tracking</h3>
-                                <p>Financial awareness</p>
+                                <h3><?php echo getContent('hero_card3_title', 'Budget Tracking'); ?></h3>
+                                <p><?php echo getContent('hero_card3_desc', 'Financial awareness'); ?></p>
                             </div>
                         </div>
                         <div class="preview-card card-4">
-                            <div class="card-icon">🔜</div>
+                            <div class="card-icon"><?php echo getContentRaw('hero_card4_icon', '🔜'); ?></div>
                             <div class="card-content">
-                                <h3>Many More</h3>
-                                <p>More updates to come...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- About OptiPlan Section -->
-        <section class="section about-section" id="about-me">
-            <div class="container">
-                <div class="about-me-content">
-                    <span class="section-label">About the Creator</span>
-                    <h2 class="section-title">Built by a Student, For Students</h2>
-                    <p class="about-me-text">
-                        Hi! I am a student who had experienced firsthand the frustration of juggling multiple apps just to organize scheduling, studying and budeeting. 
-                        After almost missing too many assignments and project deadlines, I realized I needed a better solution. That's when OptiPlan was born.
-                    </p>
-                    <p class="about-me-text">
-                        OptiPlan is my final year project and a passion project aimed at making student's life more manageable. I hope it helps you as much as it's helpde me.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Me Section -->
-        <section class="section about-me-section" id="about-optiplan">
-            <div class="container">
-                <div class="about-layout">
-                    <div class="about-visual">
-                        <div class="about-card">
-                            <div class="about-stat">
-                                <span class="about-stat-number">3-in-1</span>
-                                <span class="about-stat-label">Integrated Platform</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="about-content">
-                        <span class="section-label">About OptiPlan</span>
-                        <h2 class="section-title">Built for Students Who Want More</h2>
-                        <p class="about-text">
-                            Managing student life shouldn't require a dozen different tools. 
-                            OptiPlan unifies the essential pillars of your day—scheduling, study management, and financial health—into one streamlined interface.
-                        </p>
-                        <p class="about-text">
-                            Our technology is designed to be unobtrusive yet impactful, adapting to the nuances of your schedule to provide actionable insights. 
-                            From deadline management to budget tracking, OptiPlan ensures your most important data is always in sync, allowing you to focus on what truly matters.
-                        </p>
-                        <div class="about-features">
-                            <div class="about-feature-item">
-                                <svg class="check-icon" viewBox="0 0 24 24" fill="none">
-                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <span>AI-Powered Intelligence</span>
-                            </div>
-                            <div class="about-feature-item">
-                                <svg class="check-icon" viewBox="0 0 24 24" fill="none">
-                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <span>Unified Dashboard</span>
-                            </div>
-                            <div class="about-feature-item">
-                                <svg class="check-icon" viewBox="0 0 24 24" fill="none">
-                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <span>Student-First Design</span>
+                                <h3><?php echo getContent('hero_card4_title', 'Many More'); ?></h3>
+                                <p><?php echo getContent('hero_card4_desc', 'More updates to come...'); ?></p>
                             </div>
                         </div>
                     </div>
@@ -329,27 +290,24 @@ $userRole = $_SESSION['role'] ?? 'user';
         <section class="section problem-section" id="problem">
             <div class="container">
                 <div class="section-header">
-                    <span class="section-label">The Problem</span>
-                    <h2 class="section-title">Fragmented Productivity is Killing Your Time</h2>
+                    <span class="section-label"><?php echo getContent('problem_label', 'The Problem'); ?></span>
+                    <h2 class="section-title"><?php echo getContent('problem_title', 'Fragmented Productivity is Killing Your Time'); ?></h2>
                 </div>
                 <div class="problem-grid">
                     <div class="problem-card">
-                        <div class="problem-number">01</div>
-                        <h3>App Overload</h3>
-                        <p>Constantly switching between calendar apps, study tools, and budget trackers wastes valuable
-                            time and mental energy.</p>
+                        <div class="problem-number"><?php echo getContent('problem_card1_number', '01'); ?></div>
+                        <h3><?php echo getContent('problem_card1_title', 'App Overload'); ?></h3>
+                        <p><?php echo getContent('problem_card1_desc', 'Constantly switching between calendar apps, study tools, and budget trackers wastes valuable time and mental energy.'); ?></p>
                     </div>
                     <div class="problem-card">
-                        <div class="problem-number">02</div>
-                        <h3>Missed Tasks</h3>
-                        <p>Important deadlines and activities fall through the cracks when scattered across multiple
-                            disconnected platforms.</p>
+                        <div class="problem-number"><?php echo getContent('problem_card2_number', '02'); ?></div>
+                        <h3><?php echo getContent('problem_card2_title', 'Missed Tasks'); ?></h3>
+                        <p><?php echo getContent('problem_card2_desc', 'Important deadlines and activities fall through the cracks when scattered across multiple disconnected platforms.'); ?></p>
                     </div>
                     <div class="problem-card">
-                        <div class="problem-number">03</div>
-                        <h3>No Integration</h3>
-                        <p>Your schedule doesn't talk to your budget. Your study plan doesn't sync with your calendar.
-                            Everything exists in silos.</p>
+                        <div class="problem-number"><?php echo getContent('problem_card3_number', '03'); ?></div>
+                        <h3><?php echo getContent('problem_card3_title', 'No Integration'); ?></h3>
+                        <p><?php echo getContent('problem_card3_desc', "Your schedule doesn't talk to your budget. Your study plan doesn't sync with your calendar. Everything exists in silos."); ?></p>
                     </div>
                 </div>
             </div>
@@ -359,10 +317,9 @@ $userRole = $_SESSION['role'] ?? 'user';
         <section class="section features-section" id="features">
             <div class="container">
                 <div class="section-header centered">
-                    <span class="section-label">Features</span>
-                    <h2 class="section-title">Three Tools. One Platform. Zero Hassle.</h2>
-                    <p class="section-description">Everything you need to stay organized, productive, and financially
-                        aware.</p>
+                    <span class="section-label"><?php echo getContent('feature_label', 'Features'); ?></span>
+                    <h2 class="section-title"><?php echo getContent('feature_title', 'Three Tools. One Platform. Zero Hassle.'); ?></h2>
+                    <p class="section-description"><?php echo getContent('feature_desc', 'Everything you need to stay organized, productive, and financially aware.'); ?></p>
                 </div>
                 <div class="features-grid">
                     <!-- Feature Card 1 -->
@@ -481,28 +438,151 @@ $userRole = $_SESSION['role'] ?? 'user';
             </div>
         </section>
 
+        <!-- Growth Roadmap Section -->
+        <section class="section roadmap-section" id="roadmap">
+            <div class="container">
+                <div class="section-header centered">
+                    <span class="section-label"><?php echo getContent('roadmap_label', 'Roadmap'); ?></span>
+                    <h2 class="section-title"><?php echo getContent('roadmap_title', 'Our Growth Journey'); ?></h2>
+                    <p class="section-description"><?php echo getContent('roadmap_desc', 'From concept to a fully intelligent productivity platform — hover each milestone to explore the details.'); ?></p>
+                </div>
+
+                <div class="roadmap-road-wrap">
+                    <!-- Thin winding SVG line -->
+                    <svg class="roadmap-svg" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stop-color="#34d399"/>
+                                <stop offset="55%" stop-color="#a78bfa"/>
+                                <stop offset="100%" stop-color="#3d3355"/>
+                            </linearGradient>
+                            <filter id="lineGlow">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="glow"/>
+                                <feMerge>
+                                    <feMergeNode in="glow"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Soft glow behind the line -->
+                        <path d="M0,200 C100,200 120,80 220,80 S340,320 440,320 S560,80 660,80 S780,320 880,320 S1000,120 1100,120 L1200,120" stroke="url(#lineGrad)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.25" filter="url(#lineGlow)"/>
+
+                        <!-- Main thin line -->
+                        <path d="M0,200 C100,200 120,80 220,80 S340,320 440,320 S560,80 660,80 S780,320 880,320 S1000,120 1100,120 L1200,120" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    </svg>
+
+                    <!-- Icon nodes positioned ON the line -->
+                    <div class="roadmap-pins">
+
+                        <!-- Node 1 — Foundation Launch -->
+                        <div class="rm-pin rm-pin-1 card-above" data-status="completed">
+                            <div class="rm-card">
+                                <span class="rm-badge completed">Completed</span>
+                                <h3>Foundation Launch</h3>
+                                <p>Core authentication, unified dashboard layout, and the design system that powers OptiPlan.</p>
+                            </div>
+                            <div class="rm-node">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Node 2 — Smart Scheduler -->
+                        <div class="rm-pin rm-pin-2 card-above" data-status="completed">
+                            <div class="rm-card">
+                                <span class="rm-badge completed">Completed</span>
+                                <h3>Smart Scheduler</h3>
+                                <p>Interactive calendar with task management, deadline tracking, and keyboard shortcuts for power users.</p>
+                            </div>
+                            <div class="rm-node">
+                                <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Node 3 — Finance Tracker -->
+                        <div class="rm-pin rm-pin-3 card-below" data-status="completed">
+                            <div class="rm-card">
+                                <span class="rm-badge completed">Completed</span>
+                                <h3>Finance Tracker</h3>
+                                <p>Budget management with income/expense categorization, visual breakdowns, and spending insights.</p>
+                            </div>
+                            <div class="rm-node">
+                                <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Node 4 — AI Chatbot -->
+                        <div class="rm-pin rm-pin-4 card-above" data-status="in-dev">
+                            <div class="rm-card">
+                                <span class="rm-badge in-dev">In Development</span>
+                                <h3>AI Chatbot Assistant</h3>
+                                <p>Context-aware AI that understands your schedule, finances, and study habits to give personalized advice.</p>
+                            </div>
+                            <div class="rm-node">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Node 5 — Study Analytics -->
+                        <div class="rm-pin rm-pin-5 card-below" data-status="future">
+                            <div class="rm-card">
+                                <span class="rm-badge future">Future Innovation</span>
+                                <h3>Study Analytics</h3>
+                                <p>Deep learning insights into study patterns, focus duration tracking, and AI-generated study plans.</p>
+                            </div>
+                            <div class="rm-node">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Node 6 — Cross-Platform Sync -->
+                        <div class="rm-pin rm-pin-6 card-above" data-status="future">
+                            <div class="rm-card">
+                                <span class="rm-badge future">Future Innovation</span>
+                                <h3>Cross-Platform Sync</h3>
+                                <p>Seamless synchronization across devices with offline support and real-time collaboration features.</p>
+                            </div>
+                            <div class="rm-node">
+                                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke="currentColor" stroke-width="2"/></svg>
+                            </div>
+                        </div>
+
+                    </div><!-- /.roadmap-pins -->
+                </div><!-- /.roadmap-road-wrap -->
+
+            </div>
+        </section>
+
         <!-- Tutorial Video Section -->
         <section class="section tutorial-section" id="tutorial">
             <div class="container">
                 <div class="section-header centered">
-                    <span class="section-label">Tutorial</span>
-                    <h2 class="section-title">See OptiPlan in Action</h2>
-                    <p class="section-description">Watch a quick walkthrough of how OptiPlan can transform your
-                        productivity.</p>
+                    <span class="section-label"><?php echo getContent('tutorial_label', 'Tutorial'); ?></span>
+                    <h2 class="section-title"><?php echo getContent('tutorial_title', 'See OptiPlan in Action'); ?></h2>
+                    <p class="section-description"><?php echo getContent('tutorial_desc', 'Watch a quick walkthrough of how OptiPlan can transform your productivity.'); ?></p>
                 </div>
                 <div class="video-container">
-                    <div class="video-wrapper">
-                        <!-- Placeholder for video - replace with actual video embed -->
-                        <div class="video-placeholder">
-                            <svg class="play-icon" viewBox="0 0 80 80" fill="none">
-                                <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="2" />
-                                <path d="M32 26L54 40L32 54V26Z" fill="currentColor" />
-                            </svg>
-                            <p>Click to play tutorial video</p>
+                    <div class="mac-window">
+                        <!-- macOS title bar -->
+                        <div class="mac-titlebar">
+                            <div class="mac-dots">
+                                <span class="mac-dot mac-dot--close"></span>
+                                <span class="mac-dot mac-dot--minimize"></span>
+                                <span class="mac-dot mac-dot--maximize"></span>
+                            </div>
+                            <span class="mac-title">OptiPlan — Tutorial</span>
                         </div>
-                        <!-- For actual video, use:
-                        <iframe src="YOUR_VIDEO_URL" frameborder="0" allowfullscreen></iframe>
-                        -->
+                        <!-- Video area -->
+                        <div class="video-wrapper">
+                            <div class="video-placeholder">
+                                <svg class="play-icon" viewBox="0 0 80 80" fill="none">
+                                    <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="2" />
+                                    <path d="M32 26L54 40L32 54V26Z" fill="currentColor" />
+                                </svg>
+                                <p>Click to play tutorial video</p>
+                            </div>
+                            <!-- Replace with: <iframe src="YOUR_VIDEO_URL" frameborder="0" allowfullscreen></iframe> -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -512,75 +592,68 @@ $userRole = $_SESSION['role'] ?? 'user';
         <section class="section faq-section" id="faq">
             <div class="container">
                 <div class="section-header centered">
-                    <span class="section-label">FAQ</span>
-                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <span class="section-label"><?php echo getContent('faq_label', 'FAQ'); ?></span>
+                    <h2 class="section-title"><?php echo getContent('faq_title', 'Frequently Asked Questions'); ?></h2>
                 </div>
                 <div class="faq-list">
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false">
-                            <span>What makes OptiPlan different from other productivity apps?</span>
+                            <span><?php echo getContent('faq1_question', 'What makes OptiPlan different from other productivity apps?'); ?></span>
                             <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg>
                         </button>
                         <div class="faq-answer">
-                            <p>OptiPlan is the only platform that integrates scheduling, study support, and budgeting
-                                into one unified dashboard. While other apps focus on just one area, OptiPlan connects
-                                all aspects of student life with AI-powered insights.</p>
+                            <p><?php echo getContent('faq1_answer', 'OptiPlan is the only platform that integrates scheduling, study support, and budgeting into one unified dashboard. While other apps focus on just one area, OptiPlan connects all aspects of student life with AI-powered insights.'); ?></p>
                         </div>
                     </div>
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false">
-                            <span>Is OptiPlan free to use?</span>
+                            <span><?php echo getContent('faq2_question', 'Is OptiPlan free to use?'); ?></span>
                             <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg>
                         </button>
                         <div class="faq-answer">
-                            <p>Yes! OptiPlan offers a free tier with core features. Premium features like advanced AI
-                                insights and unlimited integrations are available with a student subscription.</p>
+                            <p><?php echo getContent('faq2_answer', 'Yes! OptiPlan offers a free tier with core features. Premium features like advanced AI insights and unlimited integrations are available with a student subscription.'); ?></p>
                         </div>
                     </div>
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false">
-                            <span>Can I sync OptiPlan with my university calendar?</span>
+                            <span><?php echo getContent('faq3_question', 'Can I sync OptiPlan with my university calendar?'); ?></span>
                             <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg>
                         </button>
                         <div class="faq-answer">
-                            <p>Absolutely! OptiPlan supports calendar imports from most university systems and can
-                                automatically sync your class schedules, assignment deadlines, and exam dates.</p>
+                            <p><?php echo getContent('faq3_answer', 'Absolutely! OptiPlan supports calendar imports from most university systems and can automatically sync your class schedules, assignment deadlines, and exam dates.'); ?></p>
                         </div>
                     </div>
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false">
-                            <span>How does the AI-powered scheduling work?</span>
+                            <span><?php echo getContent('faq4_question', 'How does the AI-powered scheduling work?'); ?></span>
                             <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg>
                         </button>
                         <div class="faq-answer">
-                            <p>Our AI learns from your behavior patterns and preferences to suggest optimal time slots
-                                for tasks, detect scheduling conflicts, and recommend breaks. The more you use OptiPlan,
-                                the smarter it becomes.</p>
+                            <p><?php echo getContent('faq4_answer', 'Our AI learns from your behavior patterns and preferences to suggest optimal time slots for tasks, detect scheduling conflicts, and recommend breaks. The more you use OptiPlan, the smarter it becomes.'); ?></p>
                         </div>
                     </div>
                     <div class="faq-item">
                         <button class="faq-question" aria-expanded="false">
-                            <span>Is my data secure?</span>
+                            <span><?php echo getContent('faq5_question', 'Is my data secure?'); ?></span>
                             <svg class="faq-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg>
                         </button>
                         <div class="faq-answer">
-                            <p>Yes! We use industry-standard encryption to protect your data. Your information is
-                                private, never sold to third parties, and you can export or delete it at any time.</p>
+                            <p><?php echo getContent('faq5_answer', 'Yes! We use industry-standard encryption to protect your data. Your information is private, never sold to third parties, and you can export or delete it at any time.'); ?></p>
                         </div>
                     </div>
                 </div>
@@ -591,22 +664,22 @@ $userRole = $_SESSION['role'] ?? 'user';
         <section class="section feedback-form-section" id="form">
             <div class="container">
                 <div class="section-header centered">
-                    <span class="section-label">Contact Us</span>
-                    <h2 class="section-title">We Value Your Feedback</h2>
-                    <p class="section-description">Have a suggestion or found a bug? Let us know how we can improve
-                        OptiPlan for you.</p>
+                    <span class="section-label"><?php echo getContent('feedback_label', 'Contact Us'); ?></span>
+                    <h2 class="section-title"><?php echo getContent('feedback_title', 'We Value Your Feedback'); ?></h2>
+                    <p class="section-description"><?php echo getContent('feedback_desc', 'Have a suggestion or found a bug? Let us know how we can improve OptiPlan for you.'); ?></p>
                 </div>
 
                 <div class="form-wrapper">
-                    <form class="contact-form" action="#" method="POST">
+                    <?php if ($isLoggedIn): ?>
+                    <form class="contact-form" id="feedbackForm" method="POST">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="name">Name</label>
-                                <input type="text" id="name" name="name" placeholder="Your Name" required>
+                                <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($userName); ?>" readonly style="opacity:0.7;cursor:not-allowed;">
                             </div>
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?>" readonly style="opacity:0.7;cursor:not-allowed;">
                             </div>
                         </div>
 
@@ -639,6 +712,21 @@ $userRole = $_SESSION['role'] ?? 'user';
                             </svg>
                         </button>
                     </form>
+                    <?php else: ?>
+                    <div class="feedback-login-prompt" style="text-align:center;padding:3rem 2rem;">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--primary-purple);margin-bottom:1rem;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <h3 style="color:var(--white);font-size:1.25rem;margin-bottom:0.5rem;">Login Required</h3>
+                        <p style="color:var(--gray-400);margin-bottom:1.5rem;">You need to be logged in to submit feedback.</p>
+                        <a href="login.php" class="btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 2rem;text-decoration:none;">
+                            Sign In to Continue
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>
@@ -647,49 +735,114 @@ $userRole = $_SESSION['role'] ?? 'user';
         <section class="section feedbacks-section" id="feedbacks">
             <div class="container">
                 <div class="section-header centered">
-                    <span class="section-label">Testimonials</span>
-                    <h2 class="section-title">What Students Are Saying</h2>
+                    <span class="section-label"><?php echo getContent('testimonial_label', 'Testimonials'); ?></span>
+                    <h2 class="section-title"><?php echo getContent('testimonial_title', 'What Students Are Saying'); ?></h2>
                 </div>
                 <div class="feedback-grid">
                     <div class="feedback-card">
                         <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
                         <p class="feedback-text">
-                            "OptiPlan changed how I manage my time. I went from constantly stressed to actually
-                            having free time. The budget tracker alone saved me hundreds this semester!"
+                            "<?php echo getContent('testimonial1_text', 'OptiPlan changed how I manage my time. I went from constantly stressed to actually having free time. The budget tracker alone saved me hundreds this semester!'); ?>"
                         </p>
                         <div class="feedback-author">
-                            <div class="author-avatar">SM</div>
+                            <div class="author-avatar"><?php echo getContent('testimonial1_initials', 'SM'); ?></div>
                             <div class="author-info">
-                                <div class="author-name">Sarah Martinez</div>
-                                <div class="author-role">Computer Science, Year 3</div>
+                                <div class="author-name"><?php echo getContent('testimonial1_name', 'Sarah Martinez'); ?></div>
+                                <div class="author-role"><?php echo getContent('testimonial1_role', 'Computer Science, Year 3'); ?></div>
                             </div>
                         </div>
                     </div>
                     <div class="feedback-card">
                         <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
                         <p class="feedback-text">
-                            "Finally, an app that gets student life. The AI scheduling is scary accurate at
-                            predicting when I need breaks. My grades improved and I'm less stressed."
+                            "<?php echo getContent('testimonial2_text', "Finally, an app that gets student life. The AI scheduling is scary accurate at predicting when I need breaks. My grades improved and I'm less stressed."); ?>"
                         </p>
                         <div class="feedback-author">
-                            <div class="author-avatar">JC</div>
+                            <div class="author-avatar"><?php echo getContent('testimonial2_initials', 'JC'); ?></div>
                             <div class="author-info">
-                                <div class="author-name">James Chen</div>
-                                <div class="author-role">Business Admin, Year 2</div>
+                                <div class="author-name"><?php echo getContent('testimonial2_name', 'James Chen'); ?></div>
+                                <div class="author-role"><?php echo getContent('testimonial2_role', 'Business Admin, Year 2'); ?></div>
                             </div>
                         </div>
                     </div>
                     <div class="feedback-card">
                         <div class="feedback-rating">⭐⭐⭐⭐⭐</div>
                         <p class="feedback-text">
-                            "I used to juggle 5 different apps. Now everything is in one place. The study
-                            planner helped me ace my finals, and the interface is actually beautiful."
+                            "<?php echo getContent('testimonial3_text', 'I used to juggle 5 different apps. Now everything is in one place. The study planner helped me ace my finals, and the interface is actually beautiful.'); ?>"
                         </p>
                         <div class="feedback-author">
-                            <div class="author-avatar">EP</div>
+                            <div class="author-avatar"><?php echo getContent('testimonial3_initials', 'EP'); ?></div>
                             <div class="author-info">
-                                <div class="author-name">Emma Park</div>
-                                <div class="author-role">Psychology, Year 4</div>
+                                <div class="author-name"><?php echo getContent('testimonial3_name', 'Emma Park'); ?></div>
+                                <div class="author-role"><?php echo getContent('testimonial3_role', 'Psychology, Year 4'); ?></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About OptiPlan Section -->
+        <section class="section about-section" id="about-me">
+            <div class="container">
+                <div class="about-me-content">
+                    <span class="section-label"><?php echo getContent('about_creator_label', 'About the Creator'); ?></span>
+                    <h2 class="section-title"><?php echo getContent('about_creator_title', 'Built by a Student, For Students'); ?></h2>
+                    <p class="about-me-text">
+                        <?php echo getContent('about_creator_p1', "Hi! I am a student who had experienced firsthand the frustration of juggling multiple apps just to organize scheduling, studying and budeeting. After almost missing too many assignments and project deadlines, I realized I needed a better solution. That's when OptiPlan was born."); ?>
+                    </p>
+                    <p class="about-me-text">
+                        <?php echo getContent('about_creator_p2', "OptiPlan is my final year project and a passion project aimed at making student's life more manageable. I hope it helps you as much as it's helpde me."); ?>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section class="section about-me-section" id="about-optiplan">
+            <div class="container">
+                <div class="about-layout">
+                    <div class="about-visual">
+                        <div class="about-card">
+                            <div class="about-stat">
+                                <span class="about-stat-number"><?php echo getContent('about_optiplan_stat_number', '3-in-1'); ?></span>
+                                <span class="about-stat-label"><?php echo getContent('about_optiplan_stat_label', 'Integrated Platform'); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-content">
+                        <span class="section-label"><?php echo getContent('about_optiplan_label', 'About OptiPlan'); ?></span>
+                        <h2 class="section-title"><?php echo getContent('about_optiplan_title', 'Built for Students Who Want More'); ?></h2>
+                        <p class="about-text">
+                            <?php echo getContent('about_optiplan_p1', "Managing student life shouldn't require a dozen different tools. OptiPlan unifies the essential pillars of your day—scheduling, study management, and financial health—into one streamlined interface."); ?>
+                        </p>
+                        <p class="about-text">
+                            <?php echo getContent('about_optiplan_p2', 'Our technology is designed to be unobtrusive yet impactful, adapting to the nuances of your schedule to provide actionable insights. From deadline management to budget tracking, OptiPlan ensures your most important data is always in sync, allowing you to focus on what truly matters.'); ?>
+                        </p>
+                        <div class="about-features">
+                            <div class="about-feature-item">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>AI-Powered Intelligence</span>
+                            </div>
+                            <div class="about-feature-item">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>Unified Dashboard</span>
+                            </div>
+                            <div class="about-feature-item">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>Student-First Design</span>
                             </div>
                         </div>
                     </div>
@@ -710,8 +863,7 @@ $userRole = $_SESSION['role'] ?? 'user';
                             </svg>
                             <span>OptiPlan</span>
                         </div>
-                        <p class="footer-tagline">Your all-in-one AI-powered productivity dashboard for students and
-                            young professionals.</p>
+                        <p class="footer-tagline"><?php echo getContent('footer_tagline', 'Your all-in-one AI-powered productivity dashboard for students and young professionals.'); ?></p>
                     </div>
                     <div class="footer-links">
                         <div class="footer-column">
@@ -743,7 +895,7 @@ $userRole = $_SESSION['role'] ?? 'user';
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p class="footer-copyright">&copy; 2026 OptiPlan. All rights reserved.</p>
+                    <p class="footer-copyright"><?php echo getContentRaw('footer_copyright', '&copy; 2026 OptiPlan. All rights reserved.'); ?></p>
                     <div class="footer-social">
                         <a href="#" aria-label="Twitter">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -769,6 +921,48 @@ $userRole = $_SESSION['role'] ?? 'user';
         </footer>
 
         <script src="../../JavaScript/script.js"></script>
+
+        <!-- Feedback Form AJAX Submit -->
+        <script>
+        (function() {
+            var form = document.getElementById('feedbackForm');
+            if (!form) return;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var btn = form.querySelector('.btn-submit');
+                var origText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = 'Sending...';
+
+                fetch('submit_feedback.php', {
+                    method: 'POST',
+                    body: new FormData(form)
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        form.reset();
+                        btn.innerHTML = 'Sent!';
+                        setTimeout(function() { btn.innerHTML = origText; btn.disabled = false; }, 2500);
+                    } else {
+                        if (data.require_login) {
+                            window.location.href = 'login.php';
+                        } else {
+                            alert(data.message || 'Something went wrong.');
+                        }
+                        btn.innerHTML = origText;
+                        btn.disabled = false;
+                    }
+                })
+                .catch(function() {
+                    alert('Network error. Please try again.');
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                });
+            });
+        })();
+        </script>
 
         <!-- Cycling Text Animation -->
         <script>

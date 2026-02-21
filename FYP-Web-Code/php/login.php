@@ -17,8 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password_hash'])) {
             // Store data in Session
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['role'] = $user['role']; 
+            $_SESSION['role'] = $user['role'];
             $_SESSION['name'] = $user['first_name'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['username'] = $user['username'] ?? '';
+            $_SESSION['pfp_path'] = $user['pfp_path'] ?? '';
 
             // Determine redirect target based on role
             $redirect = ($user['role'] === 'admin') ? 'admin.php' : 'dashboard.php';

@@ -1,0 +1,227 @@
+/* ==========================================
+   SETTINGS PAGE STYLES
+   ========================================== */
+
+.settings-container {
+    padding: 2rem;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Cards */
+.settings-card {
+    background: rgba(26, 22, 37, 0.8);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.settings-card:hover {
+    border-color: rgba(167, 139, 250, 0.3);
+}
+
+.settings-card-header {
+    padding: 1.5rem 1.5rem 0;
+}
+
+.settings-card-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #f1f0f5;
+    margin: 0 0 0.25rem;
+}
+
+.settings-card-desc {
+    font-size: 0.8125rem;
+    color: #8b8798;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.settings-card-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+}
+
+/* Form Groups */
+.settings-form-group {
+    margin-bottom: 1rem;
+}
+
+.settings-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.settings-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #a78bfa;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.settings-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    border-radius: 10px;
+    color: #f1f0f5;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.settings-input:focus {
+    outline: none;
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.12);
+}
+
+.settings-input[readonly] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Buttons */
+.btn-settings-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.5rem;
+    background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    min-height: 40px;
+    min-width: 120px;
+}
+
+.btn-settings-primary:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-settings-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-settings-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: rgba(167, 139, 250, 0.1);
+    color: #a78bfa;
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-settings-secondary:hover {
+    background: rgba(167, 139, 250, 0.18);
+    border-color: #a78bfa;
+}
+
+/* Spinner */
+.spinner-svg {
+    width: 20px;
+    height: 20px;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Profile Picture */
+.pfp-upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.pfp-preview {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(139, 92, 246, 0.15));
+    border: 2px solid rgba(167, 139, 250, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.pfp-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pfp-initials {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: 0.05em;
+}
+
+.pfp-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.pfp-file-name {
+    font-size: 0.8rem;
+    color: #8b8798;
+    margin: 0;
+}
+
+/* Messages */
+.settings-message {
+    font-size: 0.8125rem;
+    margin: 0.5rem 0 0;
+    min-height: 1.25rem;
+}
+
+.settings-message--success {
+    color: #4ade80;
+}
+
+.settings-message--error {
+    color: #f87171;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-container {
+        padding: 1rem;
+    }
+
+    .settings-card-header,
+    .settings-card-body {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+}

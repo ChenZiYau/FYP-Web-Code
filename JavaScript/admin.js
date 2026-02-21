@@ -5,9 +5,8 @@
 // Get all navigation items
 const navItems = document.querySelectorAll('.nav-item');
 const sections = {
-    'user-database': document.getElementById('section-user-database'),
-    'user-online': document.getElementById('section-user-online'),
-    'feedback': document.getElementById('section-feedback')
+    'overview': document.getElementById('section-overview'),
+    'website-content': document.getElementById('section-website-content')
 };
 
 // Add click event listeners to navigation items
@@ -43,9 +42,8 @@ function switchSection(sectionName) {
 
     // Update page title
     const titles = {
-        'user-database': 'User Database',
-        'user-online': 'Users Online',
-        'feedback': 'User Feedback'
+        'overview': 'System Overview',
+        'website-content': 'Website Content'
     };
     document.getElementById('pageTitle').textContent = titles[sectionName] || 'Dashboard';
 
@@ -333,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Admin Dashboard initialized');
     
     // Set initial active section
-    switchSection('user-database');
+    switchSection('overview');
     
     // Update current time (optional feature)
     updateTime();
@@ -450,3 +448,173 @@ document.head.appendChild(animationStyle);
 // Example usage:
 // showNotification('User updated successfully!', 'success');
 // showNotification('Data loaded', 'info');
+
+// ==========================================
+// CMS — WEBSITE CONTENT EDITOR
+// ==========================================
+
+const CMS_SECTION_MAP = {
+    'Hero': ['hero_badge', 'hero_title_line1', 'hero_title_line2', 'hero_description', 'hero_cta_primary', 'hero_cta_secondary', 'hero_stat1_number', 'hero_stat1_label', 'hero_stat2_number', 'hero_stat2_label'],
+    'Hero Cards': ['hero_card1_icon', 'hero_card1_title', 'hero_card1_desc', 'hero_card2_icon', 'hero_card2_title', 'hero_card2_desc', 'hero_card3_icon', 'hero_card3_title', 'hero_card3_desc', 'hero_card4_icon', 'hero_card4_title', 'hero_card4_desc'],
+    'Problems': ['problem_label', 'problem_title', 'problem_card1_number', 'problem_card1_title', 'problem_card1_desc', 'problem_card2_number', 'problem_card2_title', 'problem_card2_desc', 'problem_card3_number', 'problem_card3_title', 'problem_card3_desc'],
+    'Features': ['feature_label', 'feature_title', 'feature_desc'],
+    'Roadmap': ['roadmap_label', 'roadmap_title', 'roadmap_desc'],
+    'Tutorial': ['tutorial_label', 'tutorial_title', 'tutorial_desc'],
+    'FAQ': ['faq_label', 'faq_title', 'faq1_question', 'faq1_answer', 'faq2_question', 'faq2_answer', 'faq3_question', 'faq3_answer', 'faq4_question', 'faq4_answer', 'faq5_question', 'faq5_answer'],
+    'Feedback Form': ['feedback_label', 'feedback_title', 'feedback_desc'],
+    'Testimonials': ['testimonial_label', 'testimonial_title', 'testimonial1_text', 'testimonial1_name', 'testimonial1_role', 'testimonial1_initials', 'testimonial2_text', 'testimonial2_name', 'testimonial2_role', 'testimonial2_initials', 'testimonial3_text', 'testimonial3_name', 'testimonial3_role', 'testimonial3_initials'],
+    'About Creator': ['about_creator_label', 'about_creator_title', 'about_creator_p1', 'about_creator_p2'],
+    'About OptiPlan': ['about_optiplan_label', 'about_optiplan_title', 'about_optiplan_stat_number', 'about_optiplan_stat_label', 'about_optiplan_p1', 'about_optiplan_p2'],
+    'Footer': ['footer_tagline', 'footer_copyright']
+};
+
+let cmsData = {};
+let cmsLoaded = false;
+
+function loadCmsContent() {
+    if (cmsLoaded) return;
+    fetch('api_content.php')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) return;
+            data.data.forEach(row => {
+                cmsData[row.section_key] = row.content_value;
+            });
+            cmsLoaded = true;
+            renderCmsSections();
+        })
+        .catch(() => {
+            document.getElementById('cmsSections').innerHTML = '<div class="cms-loading">Failed to load content.</div>';
+        });
+}
+
+function renderCmsSections() {
+    const container = document.getElementById('cmsSections');
+    let html = '';
+
+    for (const [sectionName, keys] of Object.entries(CMS_SECTION_MAP)) {
+        html += `<div class="cms-group" data-group="${sectionName}">
+            <button class="cms-group-header" onclick="toggleCmsGroup(this)">
+                <span>${sectionName}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="cms-group-body">`;
+
+        keys.forEach(key => {
+            const val = cmsData[key] || '';
+            const isLong = key.includes('_desc') || key.includes('_p1') || key.includes('_p2') || key.includes('_answer') || key.includes('_text') || key.includes('_tagline') || key.includes('description');
+            const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+            if (isLong) {
+                html += `<div class="cms-field" data-key="${key}">
+                    <label>${label}</label>
+                    <textarea class="cms-input" data-key="${key}" rows="3">${escapeHtml(val)}</textarea>
+                    <button class="cms-save-btn" onclick="saveCmsField('${key}', this)">Save</button>
+                </div>`;
+            } else {
+                html += `<div class="cms-field" data-key="${key}">
+                    <label>${label}</label>
+                    <input type="text" class="cms-input" data-key="${key}" value="${escapeAttr(val)}">
+                    <button class="cms-save-btn" onclick="saveCmsField('${key}', this)">Save</button>
+                </div>`;
+            }
+        });
+
+        html += `</div></div>`;
+    }
+
+    container.innerHTML = html;
+}
+
+function toggleCmsGroup(btn) {
+    const group = btn.closest('.cms-group');
+    group.classList.toggle('open');
+}
+
+function saveCmsField(key, btn) {
+    const input = btn.parentElement.querySelector('.cms-input');
+    const value = input.value;
+    const origText = btn.textContent;
+
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    fetch('api_content.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: key, value: value })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            btn.textContent = 'Saved!';
+            btn.classList.add('saved');
+            cmsData[key] = value;
+            setTimeout(() => { btn.textContent = origText; btn.disabled = false; btn.classList.remove('saved'); }, 1500);
+        } else {
+            btn.textContent = 'Error';
+            setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 1500);
+        }
+    })
+    .catch(() => {
+        btn.textContent = 'Error';
+        setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 1500);
+    });
+}
+
+function resetAllContent() {
+    if (!confirm('Reset ALL website content to defaults? This cannot be undone.')) return;
+
+    fetch('api_content.php', { method: 'DELETE' })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Content reset. Reload the landing page to re-seed defaults.', 'success');
+            cmsLoaded = false;
+            cmsData = {};
+            loadCmsContent();
+        }
+    });
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function escapeAttr(str) {
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// CMS search filter
+document.addEventListener('DOMContentLoaded', function() {
+    const cmsSearch = document.getElementById('cmsSearchInput');
+    if (cmsSearch) {
+        cmsSearch.addEventListener('input', function() {
+            const term = this.value.toLowerCase();
+            document.querySelectorAll('.cms-field').forEach(field => {
+                const key = field.getAttribute('data-key');
+                const label = field.querySelector('label').textContent.toLowerCase();
+                const input = field.querySelector('.cms-input');
+                const val = (input.value || input.textContent || '').toLowerCase();
+                field.style.display = (key.includes(term) || label.includes(term) || val.includes(term)) ? '' : 'none';
+            });
+            // Show groups that have visible fields
+            document.querySelectorAll('.cms-group').forEach(group => {
+                const visibleFields = group.querySelectorAll('.cms-field:not([style*="display: none"])');
+                group.style.display = visibleFields.length > 0 ? '' : 'none';
+                if (term && visibleFields.length > 0) group.classList.add('open');
+            });
+        });
+    }
+});
+
+// Load CMS content when switching to that section
+const origSwitchSection = switchSection;
+switchSection = function(sectionName) {
+    origSwitchSection(sectionName);
+    if (sectionName === 'website-content') {
+        loadCmsContent();
+    }
+};

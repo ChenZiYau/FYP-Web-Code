@@ -429,3 +429,18 @@ function setButtonLoading(buttonSelector, isLoading) {
         btn.innerHTML = btn.dataset.originalText || 'Submit';
     }
 }
+
+// ==========================================
+// ROADMAP NODE TAP TOGGLE (TOUCH DEVICES)
+// ==========================================
+document.querySelectorAll('.rm-pin').forEach(function (pin) {
+    pin.addEventListener('click', function () {
+        var isActive = this.classList.contains('active');
+        document.querySelectorAll('.rm-pin.active').forEach(function (p) {
+            p.classList.remove('active');
+        });
+        if (!isActive) {
+            this.classList.add('active');
+        }
+    });
+});

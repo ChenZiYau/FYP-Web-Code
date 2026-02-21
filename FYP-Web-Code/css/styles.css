@@ -196,7 +196,7 @@ img {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 2.5rem;
+    gap: 3.5rem;
 }
 
 .nav-item {
@@ -208,14 +208,39 @@ img {
     align-items: center;
     gap: 0.375rem;
     font-size: 0.9375rem;
-    font-weight: 300;
+    font-weight: 400;
     color: var(--gray-600);
     padding: 0.5rem 0;
+    position: relative;
     transition: color var(--transition-base);
 }
 
+/* Animated bottom-border indicator */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    border-radius: 1px;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--transition-base);
+}
+
 .nav-link:hover {
-    color: var(--primary-purple);
+    color: var(--primary-purple-light);
+}
+
+.nav-link:hover::after,
+.dropdown.active .nav-link::after {
+    transform: scaleX(1);
+}
+
+.dropdown.active .nav-link {
+    color: var(--primary-purple-light);
 }
 
 /* Dropdown */
@@ -243,21 +268,41 @@ img {
     top: calc(100% + 1rem);
     left: 50%;
     transform: translateX(-50%) translateY(-10px);
-    background: var(--dark-surface);
-    border-radius: var(--radius-md);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    min-width: 200px;
+    background: rgba(26, 22, 37, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    min-width: 210px;
     padding: 0.5rem;
     opacity: 0;
     visibility: hidden;
     transition: all var(--transition-base);
-    border: 1px solid rgba(167, 139, 250, 0.2);
+    border: 1px solid rgba(167, 139, 250, 0.15);
 }
 
 .dropdown.active .dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
+}
+
+/* Desktop: open dropdown on hover */
+@media (hover: hover) and (min-width: 769px) {
+    .dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+    .dropdown:hover .dropdown-icon {
+        transform: rotate(180deg);
+    }
+    .dropdown:hover .nav-link {
+        color: var(--primary-purple-light);
+    }
+    .dropdown:hover .nav-link::after {
+        transform: scaleX(1);
+    }
 }
 
 .dropdown-link {
@@ -317,6 +362,10 @@ img {
     z-index: 10;
 }
 
+.hamburger {
+    position: relative;
+}
+
 .hamburger,
 .hamburger::before,
 .hamburger::after {
@@ -324,6 +373,36 @@ img {
     height: 2px;
     background: var(--gray-900);
     transition: all var(--transition-base);
+}
+
+.hamburger::before,
+.hamburger::after {
+    content: '';
+    position: absolute;
+    left: 0;
+}
+
+.hamburger::before {
+    top: -7px;
+}
+
+.hamburger::after {
+    top: 7px;
+}
+
+/* Hamburger X animation */
+.mobile-menu-toggle.active .hamburger {
+    background: transparent;
+}
+
+.mobile-menu-toggle.active .hamburger::before {
+    top: 0;
+    transform: rotate(45deg);
+}
+
+.mobile-menu-toggle.active .hamburger::after {
+    top: 0;
+    transform: rotate(-45deg);
 }
 
 /* ==========================================
@@ -955,20 +1034,61 @@ img {
    TUTORIAL VIDEO SECTION
    ========================================== */
 .video-container {
-    max-width: 900px;
+    max-width: 1060px;
     margin: 0 auto;
 }
 
+/* ── macOS-style window chrome ── */
+.mac-window {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #161222;
+    border: 1px solid rgba(167, 139, 250, 0.18);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 30px rgba(167, 139, 250, 0.12);
+}
+
+.mac-titlebar {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 16px;
+    background: #1e1830;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+.mac-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.mac-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.mac-dot--close     { background: #ff5f57; }
+.mac-dot--minimize  { background: #febc2e; }
+.mac-dot--maximize  { background: #28c840; }
+
+.mac-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--gray-400);
+    letter-spacing: 0.02em;
+}
+
+/* ── Video area inside the Mac window ── */
 .video-wrapper {
     position: relative;
-    padding-bottom: 56.25%;
-    /* 16:9 aspect ratio */
+    padding-bottom: 56.25%; /* 16:9 */
     height: 0;
     overflow: hidden;
-    border-radius: var(--radius-xl);
     background: var(--dark-surface);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(167, 139, 250, 0.2);
-    border: 1px solid rgba(167, 139, 250, 0.2);
 }
 
 .video-wrapper iframe {
@@ -1247,6 +1367,12 @@ img {
     cursor: pointer;
 }
 
+.form-group select option {
+    background: #1a1625;
+    color: var(--white);
+    padding: 0.5rem;
+}
+
 .select-icon {
     position: absolute;
     right: 1rem;
@@ -1417,12 +1543,27 @@ img {
     }
 
     .nav-links {
-        gap: 1.5rem;
+        gap: 2.5rem;
     }
 
     .hero-content {
         grid-template-columns: 1fr;
         gap: 3rem;
+        text-align: center;
+    }
+
+    .hero-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-actions {
+        justify-content: center;
+    }
+
+    .hero-stats {
+        justify-content: center;
     }
 
     .hero-title {
@@ -1430,13 +1571,18 @@ img {
     }
 
     .hero-visual {
-        height: 400px;
+        height: 350px;
+        max-width: 500px;
+        margin: 0 auto;
     }
 
     .problem-grid,
     .features-grid,
     .feedback-grid {
         grid-template-columns: 1fr;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .flip-card {
@@ -1452,25 +1598,66 @@ img {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
+
+    .footer-links {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 /* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
+    /* Mobile menu overlay */
     .nav-links {
         display: none;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 11, 26, 0.97);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 2rem 1.5rem;
+        gap: 0.5rem;
+        z-index: 999;
+        overflow-y: auto;
     }
 
-    /* Hide login/signup buttons on mobile, keep user menu */
-    .nav-actions>.btn-link,
-    .nav-actions>.btn-primary {
+    .nav-links.mobile-active {
+        display: flex;
+    }
+
+    .nav-actions {
         display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(15, 11, 26, 0.97);
+        backdrop-filter: blur(20px);
+        padding: 1.5rem;
+        gap: 1rem;
+        justify-content: center;
+        z-index: 999;
+        border-top: 1px solid rgba(167, 139, 250, 0.2);
+    }
+
+    .nav-actions.mobile-active {
+        display: flex;
+    }
+
+    /* Show all nav action items on mobile menu */
+    .nav-actions.mobile-active > .btn-link,
+    .nav-actions.mobile-active > .btn-primary {
+        display: inline-flex;
     }
 
     /* Ensure user menu is visible on mobile */
     .user-menu {
         display: block !important;
     }
-
 
     /* User menu mobile adjustments */
     .user-menu-trigger {
@@ -1490,8 +1677,40 @@ img {
         display: flex;
     }
 
+    /* Mobile dropdown menus */
+    .dropdown-menu {
+        position: static;
+        transform: none;
+        background: rgba(167, 139, 250, 0.05);
+        box-shadow: none;
+        border: none;
+        min-width: auto;
+        width: 100%;
+        padding: 0.25rem 0;
+    }
+
+    .dropdown.active .dropdown-menu {
+        transform: none;
+    }
+
+    .nav-link {
+        font-size: 1.125rem;
+        padding: 0.75rem 0;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    .dropdown-link {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Hero mobile */
     .hero {
         padding: 8rem var(--container-padding) 4rem;
+        min-height: auto;
     }
 
     .hero-title {
@@ -1499,7 +1718,7 @@ img {
     }
 
     .hero-description {
-        font-size: 1.125rem;
+        font-size: 1rem;
     }
 
     .hero-actions {
@@ -1514,6 +1733,28 @@ img {
 
     .stat-divider {
         display: none;
+    }
+
+    /* Hero cards: stack vertically */
+    .hero-visual {
+        height: auto;
+        min-height: 0;
+    }
+
+    .dashboard-preview {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+
+    .preview-card {
+        position: relative;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        animation: none;
     }
 
     .section-title {
@@ -1542,6 +1783,23 @@ img {
         gap: 1.5rem;
         text-align: center;
     }
+
+    /* Touch-friendly tap targets */
+    .btn-hero-primary,
+    .btn-hero-secondary {
+        min-height: 48px;
+        padding: 0.875rem 1.5rem;
+    }
+
+    .faq-question {
+        min-height: 48px;
+        padding: 1.25rem 1.5rem;
+    }
+
+    /* Prevent body scroll when mobile menu open */
+    body.menu-open {
+        overflow: hidden;
+    }
 }
 
 /* Small Mobile (max-width: 480px) */
@@ -1554,6 +1812,10 @@ img {
         font-size: 1.75rem;
     }
 
+    .section-description {
+        font-size: 1rem;
+    }
+
     .btn-hero-primary,
     .btn-hero-secondary,
     .btn-cta-primary,
@@ -1564,6 +1826,60 @@ img {
 
     .flip-card {
         min-height: 380px;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+    }
+
+    .preview-card {
+        padding: 1rem;
+    }
+
+    .form-wrapper {
+        padding: 1.25rem;
+    }
+
+    .feedback-card {
+        padding: 1.25rem;
+    }
+
+    .about-layout {
+        gap: 2rem;
+    }
+
+    .section {
+        padding: var(--spacing-2xl) var(--container-padding);
+    }
+}
+
+/* Extra small (max-width: 320px) */
+@media (max-width: 320px) {
+    :root {
+        --container-padding: 1rem;
+    }
+
+    .hero-title {
+        font-size: 1.625rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .nav-container {
+        height: 64px;
+    }
+
+    .logo-link {
+        font-size: 1.25rem;
+    }
+
+    .logo-icon {
+        width: 28px;
+        height: 28px;
     }
 }
 
@@ -1630,6 +1946,15 @@ button:focus {
     height: 18px;
     flex-shrink: 0;
     stroke: var(--primary-purple);
+}
+
+.user-menu-trigger .user-pfp {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(167, 139, 250, 0.4);
+    flex-shrink: 0;
 }
 
 .user-menu-trigger .user-name {
@@ -1869,4 +2194,312 @@ button:focus {
 
 .dropdown-item:hover {
     background: rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================
+   GROWTH ROADMAP SECTION
+   ========================================== */
+.roadmap-section {
+    background: var(--dark-bg);
+    overflow: visible;
+    padding-bottom: 2rem;
+}
+
+/* ── Wrapper ── */
+.roadmap-road-wrap {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    height: 500px;
+}
+
+/* ── SVG thin line ── */
+.roadmap-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ── Node container ── */
+.roadmap-pins {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* ===========================
+   ICON NODES — small circles sitting ON the line
+   =========================== */
+
+/* Each pin is a fixed 42×42 box, margin-shifted so its center lands on the left/top coordinate */
+.rm-pin {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    margin-left: -21px;   /* half width  */
+    margin-top: -21px;    /* half height */
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* The visible circle "button" */
+.rm-node {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--dark-surface);
+    border: 2.5px solid var(--primary-purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+    overflow: hidden;
+}
+
+/* Lock icon size hard */
+.rm-node svg {
+    display: block;
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px;
+    max-height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    flex-shrink: 0;
+    color: var(--primary-purple);
+    transition: color 0.3s ease;
+}
+
+/* Hover — scale up + glow */
+.rm-pin:hover .rm-node {
+    transform: scale(1.18);
+    box-shadow: 0 0 24px rgba(167, 139, 250, 0.5);
+    border-color: var(--neon-purple);
+}
+.rm-pin:hover .rm-node svg {
+    color: var(--neon-purple);
+}
+
+/* ===========================
+   STATUS COLOURS
+   =========================== */
+[data-status="completed"] .rm-node {
+    border-color: #34d399;
+    background: rgba(52, 211, 153, 0.08);
+}
+[data-status="completed"] .rm-node svg { color: #34d399; }
+[data-status="completed"]:hover .rm-node {
+    border-color: #6ee7b7;
+    box-shadow: 0 0 24px rgba(52, 211, 153, 0.5);
+}
+[data-status="completed"]:hover .rm-node svg { color: #6ee7b7; }
+
+[data-status="in-dev"] .rm-node {
+    border-color: var(--primary-purple);
+    animation: rm-pulse 2s ease-in-out infinite;
+}
+@keyframes rm-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.5); }
+    50%      { box-shadow: 0 0 0 8px rgba(167, 139, 250, 0); }
+}
+[data-status="in-dev"]:hover .rm-node {
+    animation: none;
+    border-color: #c084fc;
+    box-shadow: 0 0 24px rgba(192, 132, 252, 0.55);
+}
+[data-status="in-dev"]:hover .rm-node svg { color: #c084fc; }
+
+[data-status="future"] .rm-node {
+    border-color: var(--gray-300);
+    opacity: 0.45;
+}
+[data-status="future"] .rm-node svg { color: var(--gray-400); }
+[data-status="future"]:hover .rm-node {
+    opacity: 1;
+    border-color: var(--bright-purple);
+    box-shadow: 0 0 20px rgba(216, 180, 254, 0.35);
+}
+[data-status="future"]:hover .rm-node svg { color: var(--bright-purple); }
+
+/* ===========================
+   POSITIONS — centre of each node sits ON the SVG curve
+   Path: M0,200  C→(220,80)  S→(440,320)  S→(660,80)  S→(880,320)  →(1100,120)
+   =========================== */
+/* Evenly spaced, symmetrical peaks (20%) and valleys (80%) */
+.rm-pin-1 { left: 9%;     top: 50%; }
+.rm-pin-2 { left: 18.3%;  top: 20%; }
+.rm-pin-3 { left: 36.7%;  top: 80%; }
+.rm-pin-4 { left: 55%;    top: 20%; }
+.rm-pin-5 { left: 73.3%;  top: 80%; }
+.rm-pin-6 { left: 91.7%;  top: 30%; }
+
+/* ===========================
+   HOVER CARD — pops out smoothly from each node
+   =========================== */
+.rm-card {
+    position: absolute;
+    left: 50%;
+    width: 240px;
+    background: var(--dark-surface);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    z-index: 30;
+}
+
+/* Above — for nodes at peaks */
+.rm-pin.card-above .rm-card {
+    bottom: calc(100% + 8px);
+    top: auto;
+    transform: translateX(-50%) translateY(10px) scale(0.9);
+    transform-origin: bottom center;
+}
+
+/* Below — for nodes at valleys */
+.rm-pin.card-below .rm-card {
+    top: calc(100% + 8px);
+    bottom: auto;
+    transform: translateX(-50%) translateY(-10px) scale(0.9);
+    transform-origin: top center;
+}
+
+/* Reveal */
+.rm-pin:hover .rm-card {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    pointer-events: auto;
+    border-color: var(--gray-300);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.rm-card h3 {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 0.3rem;
+}
+
+.rm-card p {
+    font-size: 0.8rem;
+    color: var(--gray-400);
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* ── Badges ── */
+.rm-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
+    margin-bottom: 0.5rem;
+}
+.rm-badge.completed {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+}
+.rm-badge.in-dev {
+    background: rgba(167, 139, 250, 0.15);
+    color: var(--primary-purple-light);
+}
+.rm-badge.future {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--gray-400);
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+/* Tap to reveal roadmap cards on touch devices */
+.rm-pin.active .rm-card {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    pointer-events: auto;
+    border-color: var(--gray-300);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 900px) {
+    .roadmap-road-wrap {
+        height: auto;
+        padding: 2rem 0;
+    }
+
+    .roadmap-svg { display: none; }
+
+    .roadmap-pins {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding-left: 2.5rem;
+    }
+
+    .rm-pin {
+        position: relative;
+        left: auto !important;
+        top: auto !important;
+        width: auto;
+        height: auto;
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .rm-node {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+    }
+
+    .rm-node svg {
+        width: 16px !important;
+        height: 16px !important;
+        max-width: 16px;
+        max-height: 16px;
+        min-width: 16px;
+        min-height: 16px;
+    }
+
+    .rm-card {
+        position: static;
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+        width: auto;
+        flex: 1;
+        box-shadow: none;
+    }
+
+    .rm-pin:hover .rm-card {
+        transform: none;
+        box-shadow: none;
+    }
+
+    [data-status="future"] .rm-node { opacity: 0.65; }
+
+    .roadmap-pins::before {
+        content: '';
+        position: absolute;
+        left: calc(2.5rem + 18px);
+        top: 18px;
+        bottom: 18px;
+        width: 2px;
+        background: linear-gradient(180deg, #34d399 0%, var(--primary-purple) 60%, var(--gray-300) 100%);
+        opacity: 0.3;
+    }
 }

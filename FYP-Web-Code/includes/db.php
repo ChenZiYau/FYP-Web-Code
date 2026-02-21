@@ -115,6 +115,12 @@ try {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )");
 
+    // Add default_value column if missing (stores admin-set defaults)
+    $cols = array_column($pdo->query("SHOW COLUMNS FROM site_content")->fetchAll(PDO::FETCH_ASSOC), 'Field');
+    if (!in_array('default_value', $cols)) {
+        $pdo->exec("ALTER TABLE site_content ADD COLUMN default_value TEXT NULL AFTER content_value");
+    }
+
     // Seed default site content if table is empty
     $contentCount = $pdo->query("SELECT COUNT(*) FROM site_content")->fetchColumn();
     if ($contentCount == 0) {

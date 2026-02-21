@@ -562,6 +562,21 @@ function saveCmsField(key, btn) {
     });
 }
 
+function saveAsDefaults() {
+    if (!confirm('Save all current website content as the new defaults? This will overwrite any previously saved defaults.')) return;
+
+    fetch('api_content.php', { method: 'PUT', headers: { 'X-CSRF-Token': window.CSRF_TOKEN || '' } })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Current content saved as defaults!', 'success');
+        } else {
+            showNotification(data.message || 'Failed to save defaults.', 'info');
+        }
+    })
+    .catch(() => showNotification('Network error.', 'info'));
+}
+
 function resetAllContent() {
     if (!confirm('Reset ALL website content to defaults? This cannot be undone.')) return;
 

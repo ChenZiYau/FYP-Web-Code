@@ -114,6 +114,18 @@ switch ($method) {
         echo json_encode(['success' => true, 'updated' => $stmt->rowCount()]);
         break;
 
+    case 'PUT':
+        // Save current content as new defaults
+        $csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if (empty($csrfToken) || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token.']);
+            break;
+        }
+        $pdo->exec("UPDATE site_content SET default_value = content_value");
+        echo json_encode(['success' => true, 'message' => 'Current content saved as defaults.']);
+        break;
+
     case 'DELETE':
         // CSRF enforcement via header for DELETE
         $csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
@@ -122,9 +134,17 @@ switch ($method) {
             echo json_encode(['success' => false, 'message' => 'Invalid CSRF token.']);
             break;
         }
-        // Reset all content to defaults by clearing (re-seeded on next page load)
-        $pdo->exec("DELETE FROM site_content");
-        echo json_encode(['success' => true, 'message' => 'Content reset. Defaults will be restored on next page load.']);
+        // Check if admin-set defaults exist
+        $hasDefaults = $pdo->query("SELECT COUNT(*) FROM site_content WHERE default_value IS NOT NULL")->fetchColumn();
+        if ($hasDefaults > 0) {
+            // Restore from admin-set defaults
+            $pdo->exec("UPDATE site_content SET content_value = default_value WHERE default_value IS NOT NULL");
+            echo json_encode(['success' => true, 'message' => 'Content restored to saved defaults.']);
+        } else {
+            // No custom defaults — fall back to original behavior (re-seed from db.php)
+            $pdo->exec("DELETE FROM site_content");
+            echo json_encode(['success' => true, 'message' => 'Content reset. Original defaults will be restored on next page load.']);
+        }
         break;
 
     default:

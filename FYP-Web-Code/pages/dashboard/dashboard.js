@@ -16,23 +16,98 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (sidebarToggle) sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
     if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('mobile-active'));
-    if (createBtn) createBtn.addEventListener('click', () => { if (modal) modal.classList.add('active'); });
     if (closeModal) closeModal.addEventListener('click', () => modal.classList.remove('active'));
     if (cancelBtn) cancelBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+    // --- DATE CHIP QUICK-PICK LOGIC ---
+    const dateInput = document.getElementById('itemDate');
+    const dateChips = document.querySelectorAll('.date-chip');
+
+    function getISODate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    function setDateFromChip(chip) {
+        dateChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const val = chip.dataset.date;
+        if (val === 'today') {
+            dateInput.value = getISODate(new Date());
+            dateInput.classList.remove('visible');
+        } else if (val === 'tomorrow') {
+            const d = new Date();
+            d.setDate(d.getDate() + 1);
+            dateInput.value = getISODate(d);
+            dateInput.classList.remove('visible');
+        } else {
+            dateInput.classList.add('visible');
+            dateInput.focus();
+        }
+    }
+
+    dateChips.forEach(chip => {
+        chip.addEventListener('click', () => setDateFromChip(chip));
+    });
+
+    // --- TAB SWITCHING LOGIC ---
+    const modalTabs = document.querySelectorAll('.modal-tab');
+    const itemTypeInput = document.getElementById('itemType');
+    const eventTimeGroup = document.getElementById('eventTimeGroup');
+    const dateGroup = document.getElementById('dateGroup');
+    const priorityGroup = document.getElementById('priorityGroup');
+    const submitBtn = document.getElementById('createSubmitBtn');
+    const descriptionField = document.getElementById('itemDescription');
+
+    function switchTab(tabName) {
+        modalTabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+        itemTypeInput.value = tabName;
+
+        // Show/hide fields based on type
+        eventTimeGroup.style.display = tabName === 'event' ? '' : 'none';
+        dateGroup.style.display = tabName === 'note' ? 'none' : '';
+        priorityGroup.style.display = tabName === 'note' ? 'none' : '';
+
+        // Update date required attribute
+        dateInput.required = tabName !== 'note';
+
+        // Update submit button text
+        const labels = { task: 'Create Task', event: 'Create Event', note: 'Save Note' };
+        submitBtn.textContent = labels[tabName];
+
+        // Update placeholder
+        const placeholders = { task: 'Add details...', event: 'Event details...', note: 'Write your note...' };
+        descriptionField.placeholder = placeholders[tabName];
+    }
+
+    modalTabs.forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+
+    // Open modal with defaults
+    if (createBtn) {
+        createBtn.addEventListener('click', () => {
+            if (modal) modal.classList.add('active');
+            switchTab('task');
+            dateInput.value = getISODate(new Date());
+            dateChips.forEach(c => c.classList.remove('active'));
+            const todayChip = document.querySelector('.date-chip[data-date="today"]');
+            if (todayChip) todayChip.classList.add('active');
+            dateInput.classList.remove('visible');
+        });
+    }
 
 // --- PRIORITY SLIDER LOGIC ---
     const prioritySlider = document.getElementById('prioritySlider');
     const priorityText = document.getElementById('priorityText');
     const realPriorityInput = document.getElementById('realPriorityInput');
 
-    if (prioritySlider) {
-        const priorityMap = {
-            '1': { label: 'Low',    color: '#10b981', textClass: 'priority-low',    cssClass: 'low' },
-            '2': { label: 'Medium', color: '#f59e0b', textClass: 'priority-medium', cssClass: 'medium' },
-            '3': { label: 'High',   color: '#ef4444', textClass: 'priority-high',   cssClass: 'high' }
-        };
+    const priorityMap = {
+        '1': { label: 'Low',    color: '#10b981', textClass: 'priority-low',    cssClass: 'low' },
+        '2': { label: 'Medium', color: '#f59e0b', textClass: 'priority-medium', cssClass: 'medium' },
+        '3': { label: 'High',   color: '#ef4444', textClass: 'priority-high',   cssClass: 'high' }
+    };
 
-        function updatePriority(value) {
+    function updatePriority(value) {
             const priority = priorityMap[value];
             if (!priority) return;
 
@@ -63,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Initialize
         updatePriority(prioritySlider.value);
-    }
+
     // --- 3. CREATE TASK FORM HANDLING ---
     const createForm = document.getElementById('createForm');
     if (createForm) {
@@ -85,17 +160,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Reset slider back to medium after form reset
                     if (prioritySlider) {
                         prioritySlider.value = 2;
-                        const priorityText = document.getElementById('priorityText');
-                        const realPriorityInput = document.getElementById('realPriorityInput');
-                        if (priorityText) {
-                            priorityText.textContent = 'Medium';
-                            priorityText.classList.remove('priority-low', 'priority-high');
-                            priorityText.classList.add('priority-medium');
-                        }
-                        if (realPriorityInput) realPriorityInput.value = 'medium';
-                        prioritySlider.classList.remove('low', 'high');
-                        prioritySlider.classList.add('medium');
+                        updatePriority('2');
                     }
+                    // Reset tab to task
+                    switchTab('task');
                     window.location.reload();
                 } else {
                     alert('Error saving task: ' + (data.message || 'Unknown error'));
@@ -137,14 +205,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (googleData.items) combinedEvents = combinedEvents.concat(googleData.items.map(item => ({
                         title: item.summary,
                         date: item.start.date || (item.start.dateTime ? item.start.dateTime.split('T')[0] : ''),
-                        type: 'google'
+                        type: 'event',
+                        source: 'google'
                     })));
                 }
 
                 if (localRes.status === 'fulfilled' && localRes.value.ok) {
                     try {
                         const localData = await localRes.value.json();
-                        if (Array.isArray(localData)) combinedEvents = combinedEvents.concat(localData.map(item => ({ ...item, type: 'local' })));
+                        if (Array.isArray(localData)) combinedEvents = combinedEvents.concat(localData.map(item => ({ ...item, source: 'local', type: item.type || 'task' })));
                     } catch(e) {}
                 }
                 renderCalendar(currentMonth, currentYear, combinedEvents);
@@ -176,15 +245,134 @@ document.addEventListener('DOMContentLoaded', function() {
             const el = document.createElement('div');
             el.className = 'calendar-day';
             if (isOtherMonth) el.classList.add('other-month');
-            el.textContent = day;
+
+            // Accessibility: make focusable for keyboard users
+            if (!isOtherMonth) {
+                el.setAttribute('tabindex', '0');
+                el.setAttribute('role', 'button');
+            }
+
+            const dayNum = document.createElement('span');
+            dayNum.className = 'calendar-day-number';
+            dayNum.textContent = day;
+            el.appendChild(dayNum);
+
             const today = new Date();
-            if (!isOtherMonth && day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) el.classList.add('today');
+            const isToday = !isOtherMonth && day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+            if (isToday) el.classList.add('today');
+
+            // Build aria-label for screen readers
+            const dateObj = new Date(currentYear, currentMonth, day);
+            const dateLabel = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
             if (dayEvents.length > 0) {
                 el.classList.add('has-event');
-                if (dayEvents.some(e => e.type === 'google')) el.classList.add('google-event');
-                if (dayEvents.some(e => e.type === 'local')) el.classList.add('local-event');
-                el.title = dayEvents.map(e => e.title).join('\n');
+                if (dayEvents.some(e => e.source === 'google')) el.classList.add('google-event');
+                if (dayEvents.some(e => e.source === 'local')) el.classList.add('local-event');
+
+                // Screen reader summary
+                const taskSummary = dayEvents.map(ev => {
+                    let s = ev.title;
+                    if (ev.priority) s += ', ' + ev.priority + ' priority';
+                    return s;
+                }).join('. ');
+                el.setAttribute('aria-label', `${dateLabel}, ${dayEvents.length} item${dayEvents.length > 1 ? 's' : ''}: ${taskSummary}`);
+
+                // Build hover tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'calendar-tooltip';
+                tooltip.setAttribute('role', 'tooltip');
+                tooltip.setAttribute('aria-hidden', 'true');
+
+                const tooltipHeader = document.createElement('div');
+                tooltipHeader.className = 'tooltip-header';
+                tooltipHeader.textContent = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                tooltip.appendChild(tooltipHeader);
+
+                const tooltipCount = document.createElement('div');
+                tooltipCount.className = 'tooltip-count';
+                tooltipCount.textContent = dayEvents.length + ' item' + (dayEvents.length > 1 ? 's' : '');
+                tooltip.appendChild(tooltipCount);
+
+                const tooltipList = document.createElement('div');
+                tooltipList.className = 'tooltip-list';
+
+                const typeIcons = { task: '📋', event: '📅', note: '📝' };
+                const typeLabels = { task: 'Task', event: 'Event', note: 'Note' };
+
+                dayEvents.forEach(ev => {
+                    const item = document.createElement('div');
+                    item.className = 'tooltip-item';
+
+                    // Row 1: Type
+                    const typeBadge = document.createElement('div');
+                    typeBadge.className = 'tooltip-type-badge';
+                    typeBadge.textContent = (typeIcons[ev.type] || '📋') + ' ' + (typeLabels[ev.type] || 'Task');
+                    item.appendChild(typeBadge);
+
+                    // Row 2: Title
+                    const title = document.createElement('div');
+                    title.className = 'tooltip-title';
+                    title.textContent = ev.title;
+                    item.appendChild(title);
+
+                    // Row 3: Priority
+                    if (ev.priority) {
+                        const badge = document.createElement('div');
+                        badge.className = 'tooltip-priority-badge priority-' + ev.priority;
+                        badge.textContent = ev.priority.charAt(0).toUpperCase() + ev.priority.slice(1);
+                        item.appendChild(badge);
+                    }
+
+                    // Row 4: Time
+                    if (ev.event_time_start) {
+                        const formatTime = t => {
+                            const [h, m] = t.split(':');
+                            const hr = parseInt(h);
+                            return `${hr > 12 ? hr - 12 : hr || 12}:${m}${hr >= 12 ? 'pm' : 'am'}`;
+                        };
+                        let timeStr = formatTime(ev.event_time_start);
+                        if (ev.event_time_end) timeStr += ' – ' + formatTime(ev.event_time_end);
+                        const timeDiv = document.createElement('div');
+                        timeDiv.className = 'tooltip-time';
+                        timeDiv.textContent = '🕐 ' + timeStr;
+                        item.appendChild(timeDiv);
+                    }
+
+                    // Row 5: Description
+                    if (ev.description) {
+                        const desc = document.createElement('div');
+                        desc.className = 'tooltip-desc';
+                        desc.textContent = ev.description.length > 80 ? ev.description.substring(0, 80) + '…' : ev.description;
+                        item.appendChild(desc);
+                    }
+
+                    tooltipList.appendChild(item);
+                });
+
+                tooltip.appendChild(tooltipList);
+
+                if (dayEvents.length > 3) {
+                    const more = document.createElement('div');
+                    more.className = 'tooltip-more';
+                    more.textContent = `${dayEvents.length} items total`;
+                    tooltip.appendChild(more);
+                }
+
+                el.appendChild(tooltip);
+
+                // Click to pin tooltip open
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const wasPinned = el.classList.contains('pinned');
+                    // Unpin all other days first
+                    document.querySelectorAll('.calendar-day.pinned').forEach(d => d.classList.remove('pinned'));
+                    if (!wasPinned) {
+                        el.classList.add('pinned');
+                    }
+                });
+            } else {
+                el.setAttribute('aria-label', isToday ? dateLabel + ', today' : dateLabel);
             }
             return el;
         }
@@ -202,6 +390,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         fetchAllEvents();
+
+        // Click outside to dismiss pinned tooltip
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.calendar-day.pinned').forEach(d => d.classList.remove('pinned'));
+        });
     }
 
     // --- 5. FINANCE SECTION LOGIC ---
@@ -368,6 +561,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 syncBudgetTotal(settings);
                 updateFinanceStats();
                 closeFinanceSettingsModal();
+
+                // Sync budget total to server so finance page can read it
+                const totalBudget = settings.startingBalance + settings.monthlyIncome + settings.sideIncome;
+                fetch('../finance/finance_api.php?action=get_budget')
+                    .then(r => r.json())
+                    .then(data => {
+                        const existing = (data.success && data.budget) ? data.budget : {};
+                        const budgetPayload = new FormData();
+                        budgetPayload.append('action', 'save_budget');
+                        budgetPayload.append('total', totalBudget);
+                        budgetPayload.append('food', existing.food_budget || 0);
+                        budgetPayload.append('transport', existing.transport_budget || 0);
+                        budgetPayload.append('shopping', existing.shopping_budget || 0);
+                        budgetPayload.append('entertainment', existing.entertainment_budget || 0);
+                        budgetPayload.append('education', existing.education_budget || 0);
+                        budgetPayload.append('health', existing.health_budget || 0);
+                        budgetPayload.append('bills', existing.bills_budget || 0);
+                        budgetPayload.append('other', existing.other_budget || 0);
+                        if (window.CSRF_TOKEN) budgetPayload.append('csrf_token', window.CSRF_TOKEN);
+                        return fetch('../finance/finance_api.php', { method: 'POST', body: budgetPayload });
+                    })
+                    .catch(err => console.error('Budget sync failed:', err));
             });
         }
 

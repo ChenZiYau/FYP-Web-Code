@@ -188,19 +188,50 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==========================================
     // UI UPDATES
     // ==========================================
+    function formatAmount(value) {
+        const abs = Math.abs(value);
+        const sign = value < 0 ? '-' : '';
+        if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+        if (abs >= 1_000) return `${sign}$${(abs / 1_000).toFixed(1).replace(/\.0$/, '')}k`;
+        return `${sign}$${abs.toFixed(2)}`;
+    }
+
+    function setSummaryAmount(el, value) {
+        el.textContent = formatAmount(value);
+        el.removeAttribute('title');
+
+        // Custom tooltip for shorthand amounts
+        const card = el.closest('.summary-card');
+        let tooltip = card.querySelector('.amount-tooltip');
+        const exact = `$${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        const isShort = Math.abs(value) >= 1000;
+
+        if (isShort) {
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.className = 'amount-tooltip';
+                card.style.position = 'relative';
+                card.appendChild(tooltip);
+            }
+            tooltip.textContent = (value < 0 ? '-' : '') + exact;
+        } else if (tooltip) {
+            tooltip.remove();
+        }
+    }
+
     function updateSummaryCards() {
         const todayTotal = expenseManager.getTotalByPeriod('today');
-        document.getElementById('todayTotal').textContent = `$${todayTotal.toFixed(2)}`;
+        setSummaryAmount(document.getElementById('todayTotal'), todayTotal);
 
         const weekTotal = expenseManager.getTotalByPeriod('week');
-        document.getElementById('weekTotal').textContent = `$${weekTotal.toFixed(2)}`;
+        setSummaryAmount(document.getElementById('weekTotal'), weekTotal);
 
         const monthTotal = expenseManager.getTotalByPeriod('month');
-        document.getElementById('monthTotal').textContent = `$${monthTotal.toFixed(2)}`;
+        setSummaryAmount(document.getElementById('monthTotal'), monthTotal);
 
         const budgetRemaining = expenseManager.budget.total - monthTotal;
         const remainingEl = document.getElementById('budgetRemaining');
-        remainingEl.textContent = `$${budgetRemaining.toFixed(2)}`;
+        setSummaryAmount(remainingEl, budgetRemaining);
 
         if (budgetRemaining < 0) {
             remainingEl.style.color = '#ef4444';
@@ -260,17 +291,30 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderBudgetCategories() {
         const budgetContainer = document.getElementById('budgetCategories');
         const categoryTotals = expenseManager.getCategoryTotals('month');
+        const DEFAULT_DISPLAY_LIMIT = 500;
 
         budgetContainer.innerHTML = Object.keys(CATEGORIES).map(categoryKey => {
             const category = CATEGORIES[categoryKey];
             const spent = categoryTotals[categoryKey] || 0;
             const limit = expenseManager.budget[categoryKey] || 0;
+            const displayLimit = limit > 0 ? limit : DEFAULT_DISPLAY_LIMIT;
+            const hasCustomBudget = limit > 0;
 
-            if (limit === 0) return '';
-
-            const percentage = limit > 0 ? (spent / limit) * 100 : 0;
+            const percentage = (spent / displayLimit) * 100;
             const status = percentage >= 100 ? 'danger' : percentage >= 80 ? 'warning' : 'safe';
-            const statusText = percentage >= 100 ? 'Over Budget' : `${(100 - percentage).toFixed(0)}% left`;
+
+            let statusText;
+            if (percentage >= 100) {
+                statusText = 'Over Budget';
+            } else if (!hasCustomBudget && spent === 0) {
+                statusText = 'No spending yet';
+            } else {
+                statusText = `${(100 - percentage).toFixed(0)}% left`;
+            }
+
+            const limitLabel = hasCustomBudget
+                ? `of $${limit.toFixed(2)}`
+                : `of $${DEFAULT_DISPLAY_LIMIT.toFixed(2)}`;
 
             return `
                 <div class="budget-category-item">
@@ -281,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <div class="budget-category-amounts">
                             <span class="budget-spent">$${spent.toFixed(2)}</span>
-                            <span class="budget-limit">of $${limit.toFixed(2)}</span>
+                            <span class="budget-limit">${limitLabel}</span>
                         </div>
                     </div>
                     <div class="budget-progress">
@@ -461,10 +505,43 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeBudgetModal = document.getElementById('closeBudgetModal');
     const cancelBudget = document.getElementById('cancelBudget');
 
+    // Date chip quick-pick logic
+    const dateInput = document.getElementById('expenseDate');
+    const dateChips = document.querySelectorAll('.date-chip');
+
+    function getISODate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    function setDateFromChip(chip) {
+        dateChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const val = chip.dataset.date;
+        if (val === 'today') {
+            dateInput.value = getISODate(new Date());
+            dateInput.classList.remove('visible');
+        } else if (val === 'yesterday') {
+            const d = new Date();
+            d.setDate(d.getDate() - 1);
+            dateInput.value = getISODate(d);
+            dateInput.classList.remove('visible');
+        } else {
+            dateInput.classList.add('visible');
+            dateInput.focus();
+        }
+    }
+
+    dateChips.forEach(chip => {
+        chip.addEventListener('click', () => setDateFromChip(chip));
+    });
+
     if (createBtn) {
         createBtn.addEventListener('click', () => {
             expenseModal.classList.add('active');
-            document.getElementById('expenseDate').valueAsDate = new Date();
+            dateInput.value = getISODate(new Date());
+            dateChips.forEach(c => c.classList.remove('active'));
+            document.querySelector('.date-chip[data-date="today"]').classList.add('active');
+            dateInput.classList.remove('visible');
         });
     }
 

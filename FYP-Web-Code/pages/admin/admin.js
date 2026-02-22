@@ -330,8 +330,13 @@ function handleLogout(event) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Admin Dashboard initialized');
     
-    // Set initial active section
-    switchSection('overview');
+    // Set initial active section based on URL hash
+    const hash = window.location.hash.replace('#', '');
+    if (hash && sections[hash]) {
+        switchSection(hash);
+    } else {
+        switchSection('overview');
+    }
     
     // Update current time (optional feature)
     updateTime();

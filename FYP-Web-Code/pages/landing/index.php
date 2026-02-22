@@ -316,7 +316,7 @@ function getContentRaw($key, $default = '') {
                         <?php echo getContent('hero_title_line2', 'Organized.'); ?>
                     </h1>
                     <p class="hero-description">
-                        <?php echo getContent('hero_description', 'Stop switching between different applications. Optiplan unifies your schedule, studies and budgeting into one singular intelligent platform, designed speifically for students and young interns.'); ?>
+                        <?php echo getContent('hero_description', 'Fed up with app clutter? OptiPlan merges your schedules, studies, and finances into one smart AI dashboard crafted for students and young interns.'); ?>
                     </p>
                     <div class="hero-actions">
                         <?php if ($isLoggedIn): ?>
@@ -351,28 +351,28 @@ function getContentRaw($key, $default = '') {
                             <div class="card-icon" aria-hidden="true"><?php echo getContentRaw('hero_card1_icon', '📅'); ?></div>
                             <div class="card-content">
                                 <p class="card-title"><?php echo getContent('hero_card1_title', 'Smart Scheduling'); ?></p>
-                                <p><?php echo getContent('hero_card1_desc', 'AI-optimized calendar'); ?></p>
+                                <p><?php echo getContent('hero_card1_desc', 'AI Optimizes Your Calendar'); ?></p>
                             </div>
                         </article>
                         <article class="preview-card card-2">
                             <div class="card-icon" aria-hidden="true"><?php echo getContentRaw('hero_card2_icon', '📚'); ?></div>
                             <div class="card-content">
                                 <p class="card-title"><?php echo getContent('hero_card2_title', 'Study Notes'); ?></p>
-                                <p><?php echo getContent('hero_card2_desc', 'Personalized flip cards'); ?></p>
+                                <p><?php echo getContent('hero_card2_desc', 'Create Personalized Flip Cards'); ?></p>
                             </div>
                         </article>
                         <article class="preview-card card-3">
                             <div class="card-icon" aria-hidden="true"><?php echo getContentRaw('hero_card3_icon', '💰'); ?></div>
                             <div class="card-content">
                                 <p class="card-title"><?php echo getContent('hero_card3_title', 'Budget Tracking'); ?></p>
-                                <p><?php echo getContent('hero_card3_desc', 'Financial awareness'); ?></p>
+                                <p><?php echo getContent('hero_card3_desc', 'Gain Financial Awareness Easily'); ?></p>
                             </div>
                         </article>
                         <article class="preview-card card-4">
                             <div class="card-icon" aria-hidden="true"><?php echo getContentRaw('hero_card4_icon', '🔜'); ?></div>
                             <div class="card-content">
                                 <p class="card-title"><?php echo getContent('hero_card4_title', 'Many More'); ?></p>
-                                <p><?php echo getContent('hero_card4_desc', 'More updates to come...'); ?></p>
+                                <p><?php echo getContent('hero_card4_desc', 'Discover Updates Coming Soon'); ?></p>
                             </div>
                         </article>
                     </div>
@@ -391,17 +391,17 @@ function getContentRaw($key, $default = '') {
                     <article class="problem-card">
                         <div class="problem-number" aria-hidden="true"><?php echo getContent('problem_card1_number', '01'); ?></div>
                         <h3><?php echo getContent('problem_card1_title', 'App Overload'); ?></h3>
-                        <p><?php echo getContent('problem_card1_desc', 'Constantly switching between calendar apps, study tools, and budget trackers wastes valuable time and mental energy.'); ?></p>
+                        <p><?php echo getContent('problem_card1_desc', 'Endless switching among calendar apps, study tools, and budget trackers drains hours from student productivity and intern focus every day.'); ?></p>
                     </article>
                     <article class="problem-card">
                         <div class="problem-number" aria-hidden="true"><?php echo getContent('problem_card2_number', '02'); ?></div>
                         <h3><?php echo getContent('problem_card2_title', 'Missed Tasks'); ?></h3>
-                        <p><?php echo getContent('problem_card2_desc', 'Important deadlines and activities fall through the cracks when scattered across multiple disconnected platforms.'); ?></p>
+                        <p><?php echo getContent('problem_card2_desc', 'Critical deadlines and key activities slip away when spread over disjointed platforms, hurting student success and intern performance.'); ?></p>
                     </article>
                     <article class="problem-card">
                         <div class="problem-number" aria-hidden="true"><?php echo getContent('problem_card3_number', '03'); ?></div>
                         <h3><?php echo getContent('problem_card3_title', 'No Integration'); ?></h3>
-                        <p><?php echo getContent('problem_card3_desc', "Your schedule doesn't talk to your budget. Your study plan doesn't sync with your calendar. Everything exists in silos."); ?></p>
+                        <p><?php echo getContent('problem_card3_desc', "Schedules fail to connect with budgets. Study plans remain out of sync with calendars. All elements operate in isolated silos, reducing overall efficiency."); ?></p>
                     </article>
                 </div>
             </div>
@@ -560,17 +560,17 @@ function getContentRaw($key, $default = '') {
                         </defs>
 
                         <!-- Soft glow behind the line -->
-                        <path d="M0,200 C100,200 120,80 220,80 S340,320 440,320 S560,80 660,80 S780,320 880,320 S1000,120 1100,120 L1200,120" stroke="url(#lineGrad)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.25" filter="url(#lineGlow)"/>
+                        <path d="M-100,300 C0,300 0,100 100,100 C200,100 200,300 300,300 C400,300 400,100 500,100 C600,100 600,300 700,300 C800,300 800,100 900,100 C1000,100 1000,300 1100,300 C1200,300 1200,100 1300,100" stroke="url(#lineGrad)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.25" filter="url(#lineGlow)"/>
 
                         <!-- Main thin line -->
-                        <path d="M0,200 C100,200 120,80 220,80 S340,320 440,320 S560,80 660,80 S780,320 880,320 S1000,120 1100,120 L1200,120" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" fill="none"/>
+                        <path d="M-100,300 C0,300 0,100 100,100 C200,100 200,300 300,300 C400,300 400,100 500,100 C600,100 600,300 700,300 C800,300 800,100 900,100 C1000,100 1000,300 1100,300 C1200,300 1200,100 1300,100" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" fill="none"/>
                     </svg>
 
                     <!-- Icon nodes positioned ON the line -->
                     <div class="roadmap-pins">
 
                         <!-- Node 1 — Foundation Launch -->
-                        <div class="rm-pin rm-pin-1 card-above" data-status="completed">
+                        <div class="rm-pin rm-pin-1 card-below" data-status="completed">
                             <div class="rm-card">
                                 <span class="rm-badge completed">Completed</span>
                                 <h3>Foundation Launch</h3>

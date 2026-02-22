@@ -42,11 +42,25 @@ try {
         description TEXT,
         due_date DATE,
         priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
+        type ENUM('task', 'event', 'note') DEFAULT 'task',
+        event_time_start TIME DEFAULT NULL,
+        event_time_end TIME DEFAULT NULL,
         status ENUM('pending', 'completed') DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )";
     $pdo->exec($taskSql);
+
+    // Add type/event columns if table already exists without them
+    try {
+        $pdo->exec("ALTER TABLE tasks ADD COLUMN type ENUM('task', 'event', 'note') DEFAULT 'task' AFTER priority");
+    } catch (PDOException $e) { /* column already exists */ }
+    try {
+        $pdo->exec("ALTER TABLE tasks ADD COLUMN event_time_start TIME DEFAULT NULL AFTER type");
+    } catch (PDOException $e) {}
+    try {
+        $pdo->exec("ALTER TABLE tasks ADD COLUMN event_time_end TIME DEFAULT NULL AFTER event_time_start");
+    } catch (PDOException $e) {}
 
     // 6. Expenses table
     $pdo->exec("CREATE TABLE IF NOT EXISTS expenses (
@@ -115,6 +129,16 @@ try {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )");
 
+    // 12. Content Edit Log table (tracks admin CMS edits)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS content_edit_log (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        admin_id INT NOT NULL,
+        admin_name VARCHAR(100) NOT NULL,
+        section_key VARCHAR(100) NOT NULL,
+        action VARCHAR(50) NOT NULL DEFAULT 'edit',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
     // Add default_value column if missing (stores admin-set defaults)
     $cols = array_column($pdo->query("SHOW COLUMNS FROM site_content")->fetchAll(PDO::FETCH_ASSOC), 'Field');
     if (!in_array('default_value', $cols)) {
@@ -129,7 +153,7 @@ try {
             ['hero_badge', 'AI-Powered Productivity'],
             ['hero_title_line1', 'One Dashboard.'],
             ['hero_title_line2', 'Organized.'],
-            ['hero_description', 'Stop switching between different applications. Optiplan unifies your schedule, studies and budgeting into one singular intelligent platform, designed speifically for students and young interns.'],
+            ['hero_description', 'Fed up with app clutter? OptiPlan merges your schedules, studies, and finances into one smart AI dashboard crafted for students and young interns.'],
             ['hero_cta_primary', 'Get Started Free'],
             ['hero_cta_secondary', 'Watch Demo'],
             ['hero_stat1_number', '75%+'],
@@ -139,28 +163,28 @@ try {
             // Hero Cards
             ['hero_card1_icon', '📅'],
             ['hero_card1_title', 'Smart Scheduling'],
-            ['hero_card1_desc', 'AI-optimized calendar'],
+            ['hero_card1_desc', 'AI Optimizes Your Calendar'],
             ['hero_card2_icon', '📚'],
             ['hero_card2_title', 'Study Notes'],
-            ['hero_card2_desc', 'Personalized flip cards'],
+            ['hero_card2_desc', 'Create Personalized Flip Cards'],
             ['hero_card3_icon', '💰'],
             ['hero_card3_title', 'Budget Tracking'],
-            ['hero_card3_desc', 'Financial awareness'],
+            ['hero_card3_desc', 'Gain Financial Awareness Easily'],
             ['hero_card4_icon', '🔜'],
             ['hero_card4_title', 'Many More'],
-            ['hero_card4_desc', 'More updates to come...'],
+            ['hero_card4_desc', 'Discover Updates Coming Soon'],
             // Problem Section
             ['problem_label', 'The Problem'],
             ['problem_title', 'Fragmented Productivity is Killing Your Time'],
             ['problem_card1_number', '01'],
             ['problem_card1_title', 'App Overload'],
-            ['problem_card1_desc', 'Constantly switching between calendar apps, study tools, and budget trackers wastes valuable time and mental energy.'],
+            ['problem_card1_desc', 'Endless switching among calendar apps, study tools, and budget trackers drains hours from student productivity and intern focus every day.'],
             ['problem_card2_number', '02'],
             ['problem_card2_title', 'Missed Tasks'],
-            ['problem_card2_desc', 'Important deadlines and activities fall through the cracks when scattered across multiple disconnected platforms.'],
+            ['problem_card2_desc', 'Critical deadlines and key activities slip away when spread over disjointed platforms, hurting student success and intern performance.'],
             ['problem_card3_number', '03'],
             ['problem_card3_title', 'No Integration'],
-            ['problem_card3_desc', "Your schedule doesn't talk to your budget. Your study plan doesn't sync with your calendar. Everything exists in silos."],
+            ['problem_card3_desc', 'Schedules fail to connect with budgets. Study plans remain out of sync with calendars. All elements operate in isolated silos, reducing overall efficiency.'],
             // Features Section
             ['feature_label', 'Features'],
             ['feature_title', 'Three Tools. One Platform. Zero Hassle.'],

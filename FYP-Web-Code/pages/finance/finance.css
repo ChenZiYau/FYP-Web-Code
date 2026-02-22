@@ -216,6 +216,44 @@
     line-height: 1;
 }
 
+/* Amount hover tooltip */
+.amount-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: linear-gradient(135deg, #1e1b2e, #2a2540);
+    color: #e2e8f0;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.55rem 1.1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 12px rgba(167, 139, 250, 0.15);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 20;
+}
+
+.amount-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(167, 139, 250, 0.35);
+}
+
+.summary-card:hover .amount-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
 /* ==========================================
    FINANCE GRID LAYOUT
    ========================================== */
@@ -722,6 +760,51 @@
     font-size: 0.875rem;
     font-weight: 400;
     color: var(--gray-900);
+}
+
+/* ==========================================
+   DATE PICKER
+   ========================================== */
+.date-quick-picks {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.date-chip {
+    flex: 1;
+    padding: 0.625rem 0.75rem;
+    background: rgba(167, 139, 250, 0.05);
+    border: 2px solid rgba(167, 139, 250, 0.2);
+    border-radius: var(--radius-md);
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.date-chip:hover {
+    background: rgba(167, 139, 250, 0.1);
+    border-color: var(--primary-purple);
+    color: var(--gray-900);
+}
+
+.date-chip.active {
+    background: var(--gradient-card);
+    border-color: var(--primary-purple);
+    color: var(--gray-900);
+    box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
+}
+
+.date-input-hidden {
+    display: none;
+}
+
+.date-input-hidden.visible {
+    display: block;
+    margin-top: 0.5rem;
 }
 
 /* ==========================================

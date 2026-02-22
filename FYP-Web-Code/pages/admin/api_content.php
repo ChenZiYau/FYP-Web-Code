@@ -73,6 +73,9 @@ switch ($method) {
         // Batch update support
         if (isset($input['updates']) && is_array($input['updates'])) {
             $stmt = $pdo->prepare("UPDATE site_content SET content_value = ? WHERE section_key = ?");
+            $logStmt = $pdo->prepare("INSERT INTO content_edit_log (admin_id, admin_name, section_key, action) VALUES (?, ?, ?, 'edit')");
+            $adminId = $_SESSION['user_id'];
+            $adminName = ($_SESSION['first_name'] ?? 'Admin') . ' ' . ($_SESSION['last_name'] ?? '');
             $updated = 0;
             foreach ($input['updates'] as $item) {
                 if (!isset($item['key']) || !isset($item['value'])) continue;
@@ -80,7 +83,10 @@ switch ($method) {
                 $value = validate_string($item['value'] ?? '', 0, 10000);
                 if ($value === false || !is_valid_section_key($key, $allowedKeyPrefixes)) continue;
                 $stmt->execute([$value, $key]);
-                $updated += $stmt->rowCount();
+                if ($stmt->rowCount() > 0) {
+                    $updated += $stmt->rowCount();
+                    $logStmt->execute([$adminId, trim($adminName), $key]);
+                }
             }
             echo json_encode(['success' => true, 'updated' => $updated]);
             break;
@@ -111,6 +117,13 @@ switch ($method) {
         $stmt = $pdo->prepare("UPDATE site_content SET content_value = ? WHERE section_key = ?");
         $stmt->execute([$value, $key]);
 
+        if ($stmt->rowCount() > 0) {
+            $adminId = $_SESSION['user_id'];
+            $adminName = ($_SESSION['first_name'] ?? 'Admin') . ' ' . ($_SESSION['last_name'] ?? '');
+            $logStmt = $pdo->prepare("INSERT INTO content_edit_log (admin_id, admin_name, section_key, action) VALUES (?, ?, ?, 'edit')");
+            $logStmt->execute([$adminId, trim($adminName), $key]);
+        }
+
         echo json_encode(['success' => true, 'updated' => $stmt->rowCount()]);
         break;
 
@@ -123,6 +136,9 @@ switch ($method) {
             break;
         }
         $pdo->exec("UPDATE site_content SET default_value = content_value");
+        $adminName = ($_SESSION['first_name'] ?? 'Admin') . ' ' . ($_SESSION['last_name'] ?? '');
+        $pdo->prepare("INSERT INTO content_edit_log (admin_id, admin_name, section_key, action) VALUES (?, ?, 'all', 'save_defaults')")
+            ->execute([$_SESSION['user_id'], trim($adminName)]);
         echo json_encode(['success' => true, 'message' => 'Current content saved as defaults.']);
         break;
 
@@ -136,13 +152,18 @@ switch ($method) {
         }
         // Check if admin-set defaults exist
         $hasDefaults = $pdo->query("SELECT COUNT(*) FROM site_content WHERE default_value IS NOT NULL")->fetchColumn();
+        $adminName = ($_SESSION['first_name'] ?? 'Admin') . ' ' . ($_SESSION['last_name'] ?? '');
         if ($hasDefaults > 0) {
             // Restore from admin-set defaults
             $pdo->exec("UPDATE site_content SET content_value = default_value WHERE default_value IS NOT NULL");
+            $pdo->prepare("INSERT INTO content_edit_log (admin_id, admin_name, section_key, action) VALUES (?, ?, 'all', 'reset_to_defaults')")
+                ->execute([$_SESSION['user_id'], trim($adminName)]);
             echo json_encode(['success' => true, 'message' => 'Content restored to saved defaults.']);
         } else {
             // No custom defaults — fall back to original behavior (re-seed from db.php)
             $pdo->exec("DELETE FROM site_content");
+            $pdo->prepare("INSERT INTO content_edit_log (admin_id, admin_name, section_key, action) VALUES (?, ?, 'all', 'reset_to_original')")
+                ->execute([$_SESSION['user_id'], trim($adminName)]);
             echo json_encode(['success' => true, 'message' => 'Content reset. Original defaults will be restored on next page load.']);
         }
         break;

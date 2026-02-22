@@ -377,6 +377,8 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
             </div>
 
             <form class="modal-form" id="createForm">
+                <input type="hidden" name="type" id="itemType" value="task">
+
                 <div class="form-group">
                     <label for="itemTitle">Title</label>
                     <input type="text" id="itemTitle" name="title" placeholder="Enter title..." required>
@@ -384,39 +386,53 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
 
                 <div class="form-group">
                     <label for="itemDescription">Description</label>
-                    <textarea id="itemDescription" name="description" placeholder="Add details..." rows="3"></textarea>
+                    <textarea id="itemDescription" name="description" placeholder="Add details..." rows="5"></textarea>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="itemDate">Date</label>
-                        <input type="date" id="itemDate" name="date" required 
-                            min="2024-01-01" max="2030-12-31"
-                            onblur="if(this.value > '2030-12-31') this.value = '2030-12-31';">
+                <!-- Event-only: time range -->
+                <div class="form-group event-only-field" id="eventTimeGroup" style="display:none;">
+                    <label>Time</label>
+                    <div class="time-range-row">
+                        <input type="time" id="eventTimeStart" name="time_start">
+                        <span class="time-separator">to</span>
+                        <input type="time" id="eventTimeEnd" name="time_end">
+                    </div>
+                </div>
+
+                <!-- Date section with quick-picks (hidden for notes) -->
+                <div class="form-group" id="dateGroup">
+                    <label for="itemDate">Date</label>
+                    <div class="date-quick-picks">
+                        <button type="button" class="date-chip active" data-date="today">Today</button>
+                        <button type="button" class="date-chip" data-date="tomorrow">Tomorrow</button>
+                        <button type="button" class="date-chip" data-date="custom">Pick a date</button>
+                    </div>
+                    <input type="date" id="itemDate" name="date" required class="date-input-hidden"
+                        min="2024-01-01" max="2030-12-31">
+                </div>
+
+                <!-- Priority (hidden for notes) -->
+                <div class="form-group" id="priorityGroup">
+                    <div class="priority-header">
+                        <label>Priority</label>
+                        <span id="priorityText" class="priority-display priority-medium">Medium</span>
                     </div>
 
-                    <div class="form-group">
-                        <div class="priority-header">
-                            <label>Priority</label>
-                            <span id="priorityText" class="priority-display priority-medium">Medium</span>
-                        </div>
+                    <div class="slider-container">
+                        <input type="range" id="prioritySlider" min="1" max="3" step="1" value="2" class="priority-range">
+                        <input type="hidden" name="priority" id="realPriorityInput" value="medium">
+                    </div>
 
-                        <div class="slider-container">
-                            <input type="range" id="prioritySlider" min="1" max="3" step="1" value="2" class="priority-range">
-                            <input type="hidden" name="priority" id="realPriorityInput" value="medium">
-                        </div>
-
-                        <div class="slider-labels">
-                            <span>Low</span>
-                            <span>Medium</span>
-                            <span>High</span>
-                        </div>
+                    <div class="slider-labels">
+                        <span>Low</span>
+                        <span>Medium</span>
+                        <span>High</span>
                     </div>
                 </div>
 
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="create-btn" style="border:none; padding: 0.5rem 1rem; border-radius: 0.5rem;">Create Task</button>
+                    <button type="submit" class="btn-primary" id="createSubmitBtn">Create Task</button>
                 </div>
             </form>
         </div>
@@ -460,7 +476,7 @@ $progress_percentage = ($next_level_points > 0) ? round(($user_points / $next_le
 
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" id="cancelFinanceSettings">Cancel</button>
-                    <button type="submit" class="create-btn" style="border:none; padding:0.5rem 1rem; border-radius:0.5rem;">Save</button>
+                    <button type="submit" class="btn-primary">Save</button>
                 </div>
             </form>
         </div>

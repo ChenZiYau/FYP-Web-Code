@@ -635,28 +635,32 @@ img {
 .card-1 {
     top: 3%;
     left: 15%;
-    width: 300px;
+    width: 360px;
+    height: 90px;
     animation-delay: 1s;
 }
 
 .card-2 {
     top: 27%;
     left: 40%;
-    width: 300px;
+    width: 360px;
+    height: 90px;
     animation-delay: 0.5s;
 }
 
 .card-3 {
     top: 51%;
     left: 15%;
-    width: 300px;
+    width: 360px;
+    height: 90px;
     animation-delay: 1s;
 }
 
 .card-4 {
     top: 75%;
     left: 40%;
-    width: 300px;
+    width: 360px;
+    height: 90px;
     animation-delay: 1.5s;
 }
 
@@ -2332,13 +2336,13 @@ button:focus {
    POSITIONS — centre of each node sits ON the SVG curve
    Path: M0,200  C→(220,80)  S→(440,320)  S→(660,80)  S→(880,320)  →(1100,120)
    =========================== */
-/* Evenly spaced, symmetrical peaks (20%) and valleys (80%) */
-.rm-pin-1 { left: 9%;     top: 50%; }
-.rm-pin-2 { left: 18.3%;  top: 20%; }
-.rm-pin-3 { left: 36.7%;  top: 80%; }
-.rm-pin-4 { left: 55%;    top: 20%; }
-.rm-pin-5 { left: 73.3%;  top: 80%; }
-.rm-pin-6 { left: 91.7%;  top: 30%; }
+/* Evenly spaced, symmetrical peaks (25%) and valleys (75%) */
+.rm-pin-1 { left: 8.3%;   top: 25%; }
+.rm-pin-2 { left: 25%;    top: 75%; }
+.rm-pin-3 { left: 41.7%;  top: 25%; }
+.rm-pin-4 { left: 58.3%;  top: 75%; }
+.rm-pin-5 { left: 75%;    top: 25%; }
+.rm-pin-6 { left: 91.7%;  top: 75%; }
 
 /* ===========================
    HOVER CARD — pops out smoothly from each node

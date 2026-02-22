@@ -366,7 +366,12 @@ $user_level = 19;
                 
                 <div class="form-group">
                     <label for="expenseDate">Date</label>
-                    <input type="date" id="expenseDate" name="date" required>
+                    <div class="date-quick-picks">
+                        <button type="button" class="date-chip active" data-date="today">Today</button>
+                        <button type="button" class="date-chip" data-date="yesterday">Yesterday</button>
+                        <button type="button" class="date-chip" data-date="custom">Pick a date</button>
+                    </div>
+                    <input type="date" id="expenseDate" name="date" required class="date-input-hidden">
                 </div>
                 
                 <div class="modal-actions">

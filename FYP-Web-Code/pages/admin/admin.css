@@ -571,14 +571,16 @@ ul {
 }
 
 .btn-secondary {
-    background: rgba(167, 139, 250, 0.1);
-    color: var(--primary-purple);
+    background: transparent;
+    color: var(--gray-200);
     border: 1px solid rgba(167, 139, 250, 0.3);
+    border-radius: 2rem;
 }
 
 .btn-secondary:hover {
-    background: rgba(167, 139, 250, 0.15);
-    border-color: var(--primary-purple);
+    background: rgba(167, 139, 250, 0.1);
+    border-color: rgba(167, 139, 250, 0.5);
+    color: var(--white);
 }
 
 .btn svg {
@@ -999,6 +1001,10 @@ ul {
 
 .activity-avatar.feedback {
     background: linear-gradient(135deg, #34d399, #059669);
+}
+
+.activity-avatar.content {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
 .activity-body {

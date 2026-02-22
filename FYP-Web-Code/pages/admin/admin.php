@@ -60,6 +60,27 @@ try {
         ];
     }
 
+    // Content edit logs
+    $recentEdits = $pdo->query("SELECT admin_name, section_key, action, created_at FROM content_edit_log ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($recentEdits as $edit) {
+        $label = str_replace('_', ' ', $edit['section_key']);
+        if ($edit['action'] === 'save_defaults') {
+            $desc = 'saved all content as defaults';
+        } elseif ($edit['action'] === 'reset_to_defaults') {
+            $desc = 'reset content to saved defaults';
+        } elseif ($edit['action'] === 'reset_to_original') {
+            $desc = 'reset content to original defaults';
+        } else {
+            $desc = 'edited "' . htmlspecialchars($label) . '"';
+        }
+        $recentActivity[] = [
+            'avatar' => strtoupper(substr($edit['admin_name'], 0, 2)),
+            'text' => htmlspecialchars($edit['admin_name']) . ' ' . $desc,
+            'time' => $edit['created_at'],
+            'type' => 'content'
+        ];
+    }
+
     // Sort by time descending
     usort($recentActivity, function($a, $b) {
         return strtotime($b['time']) - strtotime($a['time']);
@@ -262,6 +283,8 @@ try {
                                 <div class="activity-type-icon">
                                     <?php if ($act['type'] === 'user'): ?>
                                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                                    <?php elseif ($act['type'] === 'content'): ?>
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     <?php else: ?>
                                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
                                     <?php endif; ?>

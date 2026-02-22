@@ -21,7 +21,7 @@ if ($month === false || $year === false) {
     exit;
 }
 
-$sql = "SELECT title, due_date as date FROM tasks
+$sql = "SELECT title, description, due_date as date, priority, type, event_time_start, event_time_end FROM tasks
         WHERE user_id = ?
         AND MONTH(due_date) = ?
         AND YEAR(due_date) = ?
